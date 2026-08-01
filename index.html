@@ -39,6 +39,8 @@ h3{font-size:16px;text-transform:uppercase;letter-spacing:.05em}
 .gate-card{width:100%;max-width:380px}
 .gate-card input{width:100%;padding:11px 12px;border:1px solid var(--linha);background:var(--branco);
   font-family:var(--mono);font-size:15px;letter-spacing:.12em;text-transform:uppercase;border-radius:2px}
+.gate-card input.livre{text-transform:none;letter-spacing:normal}
+#wrapPass{margin-top:12px}
 .gate-card input::placeholder{letter-spacing:.05em;text-transform:none;color:var(--tinta3)}
 .btn{display:inline-block;padding:10px 16px;border:1px solid var(--verde);background:var(--verde);color:#fff;
   border-radius:2px;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-weight:600;font-size:14px}
@@ -225,8 +227,12 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
     <div class="gate-lock lockup"><div class="logo" role="img" aria-label="go2apply"></div><span class="mpd">MPD</span></div>
     <h2 style="margin-bottom:6px">Manejo de plantas daninhas</h2>
     <p style="color:var(--tinta2);margin:0 0 20px">Histórico de controle de plantas daninhas por talhão. Acesso restrito a clientes da consultoria Equalizagro.</p>
-    <label class="eyebrow" for="code">Código do cliente</label>
+    <label class="eyebrow" for="code" id="lblCode">Código do cliente</label>
     <input id="code" placeholder="ex.: SRQ-2201" autocomplete="off">
+    <div id="wrapPass" hidden>
+      <label class="eyebrow" for="pass">Senha</label>
+      <input id="pass" type="password" autocomplete="current-password">
+    </div>
     <div class="err" id="gerr"></div>
     <button class="btn" id="enter" style="width:100%">Entrar</button>
     <p class="hint">Protótipo de demonstração — use <span class="mono">SRQ-2201</span> ou <span class="mono">DEMO</span>. A autenticação de verdade fica no servidor, não aqui.</p>
@@ -344,6 +350,22 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
 </div></div>
 
 <script>
+/* ===================================================================
+   CONFIGURAÇÃO DO FIREBASE
+   Cole aqui o objeto firebaseConfig do console (Configurações do projeto →
+   Seus apps → ícone </>). Enquanto ficar null, o app roda em modo de
+   demonstração, com os dados fictícios embutidos abaixo e sem gravar nada.
+   Esta configuração não é segredo — quem protege os dados é firestore.rules.
+   =================================================================== */
+const FIREBASE = null;
+/* exemplo:
+const FIREBASE = {
+  apiKey: "...", authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto", storageBucket: "seu-projeto.appspot.com",
+  messagingSenderId: "...", appId: "..."
+};
+*/
+
 /* ===================== dados de exemplo ===================== */
 const MES = ["Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar"];
 const TIPO = {
@@ -489,6 +511,112 @@ P.talhoes.forEach(t=>{
   delete t.safras;
 });
 
+/* ===================================================================
+   CAMADA DE DADOS
+   Duas implementações com a mesma interface. O resto do app não sabe
+   qual está ativa: sempre lê de P.talhoes (memória) e grava por DB.
+   =================================================================== */
+const DEMO_EMBUTIDO = JSON.parse(JSON.stringify(P));
+
+const DB = {
+  modo: FIREBASE ? "firestore" : "demo",
+  usuario: null,      /* { uid, nome, papel, clienteId } */
+  _fb: null,          /* módulos do SDK, carregados sob demanda */
+
+  async _sdk(){
+    if(this._fb) return this._fb;
+    const [app,auth,fs] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js")
+    ]);
+    const a = app.initializeApp(FIREBASE);
+    this._fb = {auth:auth.getAuth(a), db:fs.getFirestore(a), A:auth, F:fs};
+    return this._fb;
+  },
+
+  /* ---- autenticação ---- */
+  async entrar(id, senha){
+    if(this.modo==="demo"){
+      const v=(id||"").trim().toUpperCase();
+      if(v!=="SRQ-2201" && v!=="DEMO") throw new Error("Código não encontrado. Confira com seu consultor.");
+      this.usuario={uid:"demo",nome:"Demonstração",papel:"consultor",clienteId:null};
+      return;
+    }
+    const {auth,db,A,F} = await this._sdk();
+    let cred;
+    try{
+      cred = await A.signInWithEmailAndPassword(auth, id.trim(), senha);
+    }catch(e){
+      throw new Error(e.code==="auth/invalid-credential" || e.code==="auth/wrong-password"
+        ? "E-mail ou senha incorretos." : "Não foi possível entrar: "+e.code);
+    }
+    const perf = await F.getDoc(F.doc(db,"usuarios",cred.user.uid));
+    if(!perf.exists()) throw new Error("Usuário sem perfil cadastrado. Fale com a Equalizagro.");
+    this.usuario = {uid:cred.user.uid, ...perf.data()};
+  },
+
+  async sair(){
+    if(this.modo==="firestore"){const {auth,A}=await this._sdk(); await A.signOut(auth);}
+    this.usuario=null; location.reload();
+  },
+
+  /* ---- leitura: preenche P a partir do banco ---- */
+  async carregar(){
+    if(this.modo==="demo"){
+      Object.assign(P, JSON.parse(JSON.stringify(DEMO_EMBUTIDO)));
+      return;
+    }
+    const {db,F} = await this._sdk(), u=this.usuario;
+    const ids = u.papel==="consultor"
+      ? (await F.getDocs(F.collection(db,"clientes"))).docs.map(d=>d.id)
+      : [u.clienteId];
+    if(!ids.length) throw new Error("Nenhum cliente vinculado a este usuário.");
+
+    this.clientes=[];
+    for(const id of ids){
+      const c = await F.getDoc(F.doc(db,"clientes",id));
+      if(c.exists()) this.clientes.push({id, ...c.data()});
+    }
+    await this.abrirCliente(this.clientes[0].id);
+  },
+
+  async abrirCliente(clienteId){
+    const {db,F} = await this._sdk();
+    const c = this.clientes.find(x=>x.id===clienteId);
+    this.clienteAtual = clienteId;
+    P.nome = c.nome; P.mun = c.municipio || ""; P.talhoes = [];
+
+    const tal = await F.getDocs(F.collection(db,"clientes",clienteId,"talhoes"));
+    for(const d of tal.docs){
+      const [mj,us,pr] = await Promise.all([
+        F.getDocs(F.collection(db,"clientes",clienteId,"talhoes",d.id,"manejos")),
+        F.getDocs(F.collection(db,"clientes",clienteId,"talhoes",d.id,"uso")),
+        F.getDocs(F.collection(db,"clientes",clienteId,"talhoes",d.id,"pressao"))
+      ]);
+      const pressao={}; pr.docs.forEach(x=>pressao[x.id]=x.data().especies||{});
+      P.talhoes.push({
+        id:d.id, ...d.data(),
+        ops: mj.docs.map(x=>({id:x.id, ...x.data()})).filter(o=>o.status!=="cancelado"&&o.status!=="corrigido"),
+        uso: us.docs.filter(x=>x.data().status!=="cancelado")
+                   .map(x=>[x.data().cultura, x.data().inicio, x.data().fim]),
+        pressao
+      });
+    }
+  },
+
+  /* ---- escrita: append-only ---- */
+  async salvarManejo(op){
+    if(this.modo==="demo"){ T().ops.push(op); return; }
+    const {db,F}=await this._sdk(), u=this.usuario;
+    const ref = F.collection(db,"clientes",this.clienteAtual,"talhoes",T().id,"manejos");
+    const doc = {...op, status:"ativo", criadoPor:u.uid, criadoPorNome:u.nome||u.email,
+                 criadoEm:F.serverTimestamp()};
+    const novo = await F.addDoc(ref, doc);
+    T().ops.push({id:novo.id, ...doc, criadoEm:new Date().toISOString()});
+  }
+};
+
 /* ===================== estado ===================== */
 let cur=0, selKey=null, MW=110, START=3;   /* MW = largura do mês em px, START = 0 jan … 3 abr */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -621,7 +749,8 @@ function showDetail(tag,i){
   }else h+=`<p style="font-size:13px;color:var(--tinta2);margin:0">Manejo sem aplicação de herbicida.</p>`;
   h+=`<div class="kv"><div><span>Alvos</span>${o.alvos.map(cap).join(", ")||"—"}</div>
     ${o.prods.length||o.tipo==="mec"?`<div><span>Eficácia observada</span>${o.efic?o.efic+"%":"—"}</div>`:""}
-    <div><span>Área</span>${t.ha} ha</div></div>`;
+    <div><span>Área</span>${t.ha} ha</div>
+    ${o.criadoPorNome?`<div><span>Registrado por</span>${esc(o.criadoPorNome)}</div>`:""}</div>`;
   if(o.obs)h+=`<div class="note">${esc(o.obs)}</div>`;
   $("#detail").innerHTML=h;
 }
@@ -735,7 +864,15 @@ function render(){
 function marcarEscala(){$$("#escala .chip").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.w===MW))}
 
 function boot(){
-  $("#fz").innerHTML=`<option>${P.nome} — ${P.mun}</option>`;
+  if(DB.modo==="firestore" && DB.clientes && DB.clientes.length>1){
+    $("#fz").innerHTML=DB.clientes.map(c=>
+      `<option value="${c.id}"${c.id===DB.clienteAtual?" selected":""}>${c.nome} — ${c.municipio||""}</option>`).join("");
+    $("#fz").onchange=async e=>{
+      await DB.abrirCliente(e.target.value);
+      cur=0; $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}">${t.nome} · ${t.ha} ha</option>`).join("");
+      fillCiclos(); render();
+    };
+  } else $("#fz").innerHTML=`<option>${P.nome} — ${P.mun}</option>`;
   $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}">${t.nome} · ${t.ha} ha</option>`).join("");
   $("#mstart").innerHTML=[3,4,5,6,0].map(m=>`<option value="${m}"${m===START?" selected":""}>${cap(MESL[m])}</option>`).join("");
   $("#tl").onchange=e=>{cur=+e.target.value;fillCiclos();render()};
@@ -788,13 +925,27 @@ $("#irpara").onclick=e=>{
  const l=document.createElement("link");l.rel="icon";l.href=u;document.head.appendChild(l);})();
 
 /* portão */
-function entrar(){
-  const v=$("#code").value.trim().toUpperCase();
-  if(v==="SRQ-2201"||v==="DEMO"){$("#gate").remove();$("#app").hidden=false;boot()}
-  else $("#gerr").textContent="Código não encontrado. Confira com seu consultor.";
+if(DB.modo==="firestore"){
+  $("#lblCode").textContent="E-mail";
+  $("#code").type="email"; $("#code").placeholder="voce@fazenda.com.br";
+  $("#code").classList.add("livre"); $("#code").autocomplete="username";
+  $("#wrapPass").hidden=false;
+  $(".hint").innerHTML="Acesso concedido pela Equalizagro. Esqueceu a senha? Fale com seu consultor.";
+}
+async function entrar(){
+  const btn=$("#enter"); btn.disabled=true; $("#gerr").textContent="";
+  try{
+    await DB.entrar($("#code").value, $("#pass").value);
+    await DB.carregar();
+    $("#gate").remove(); $("#app").hidden=false; boot();
+  }catch(e){
+    $("#gerr").textContent=e.message||"Não foi possível entrar.";
+    btn.disabled=false;
+  }
 }
 $("#enter").onclick=entrar;
 $("#code").onkeydown=e=>{if(e.key==="Enter")entrar()};
+$("#pass").onkeydown=e=>{if(e.key==="Enter")entrar()};
 
 /* modais */
 $("#openAdd").onclick=()=>{$("#mAdd").hidden=false;$("#a-data").focus()};
@@ -803,16 +954,18 @@ $$("[data-close]").forEach(b=>b.onclick=()=>{$("#"+b.dataset.close).hidden=true}
 $$(".mask").forEach(m=>m.onclick=e=>{if(e.target===m)m.hidden=true});
 document.onkeydown=e=>{if(e.key==="Escape")$$(".mask").forEach(m=>m.hidden=true)};
 
-$("#saveAdd").onclick=()=>{
+$("#saveAdd").onclick=async ()=>{
   const data=$("#a-data").value;
   if(!data){$("#aerr").textContent="Informe a data do manejo.";return}
   const prods=$("#a-prod").value.split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
     const p=l.split("|").map(x=>x.trim());
     return {nome:p[0]||"—",ia:p[1]||"—",dose:p[2]||"—",hrac:p[3]||""};
   });
-  T().ops.push({data,tipo:$("#a-tipo").value,
+  const op={data,tipo:$("#a-tipo").value,
     alvos:$("#a-alvo").value.split(",").map(x=>x.trim()).filter(Boolean),
-    prods,efic:+$("#a-efic").value||0,obs:$("#a-obs").value.trim()});
+    prods,efic:+$("#a-efic").value||0,obs:$("#a-obs").value.trim()};
+  try{ await DB.salvarManejo(op); }
+  catch(e){ $("#aerr").textContent="Não foi possível gravar: "+(e.message||e); return; }
   $("#aerr").textContent="";$("#mAdd").hidden=true;
   ["a-alvo","a-prod","a-efic","a-obs"].forEach(id=>$("#"+id).value="");
   fillCiclos();render();
