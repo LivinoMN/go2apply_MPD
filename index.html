@@ -1,0 +1,833 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>go2apply MPD — Manejo de Plantas Daninhas</title>
+<meta name="theme-color" content="#5C9245">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --papel:#EDEFE9; --branco:#FBFCFA;
+  --tinta:#16241F; --tinta2:#4A5A53; --tinta3:#7C8A83;
+  --linha:#C6CDC3; --linha2:#DDE2DA;
+  --dye:#2C3EA8; --alerta:#A93226; --ocre:#9A6A12;
+  --verde:#5C9245; --verde-esc:#4B7A37; --laranja:#EA9F0E;
+  --soja:#3E7D32; --trigo:#C08A1E; --aveia:#7E9B2F;
+  --milho:#B4632A; --cobertura:#4F6E7A; --pousio:#A9A296;
+  --logo:url("data:image/png;base64,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");
+  --disp:"Barlow Condensed",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--papel);color:var(--tinta);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.eyebrow{font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-size:12px;color:var(--tinta3)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:-0.005em;margin:0;line-height:1.05}
+h1{font-size:30px;text-transform:uppercase;letter-spacing:.02em}
+h2{font-size:22px;text-transform:uppercase;letter-spacing:.03em}
+h3{font-size:16px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- portão de acesso ---------- */
+#gate{position:fixed;inset:0;background:var(--papel);z-index:50;display:grid;place-items:center;padding:24px}
+.gate-card{width:100%;max-width:380px}
+.gate-card input{width:100%;padding:11px 12px;border:1px solid var(--linha);background:var(--branco);
+  font-family:var(--mono);font-size:15px;letter-spacing:.12em;text-transform:uppercase;border-radius:2px}
+.gate-card input::placeholder{letter-spacing:.05em;text-transform:none;color:var(--tinta3)}
+.btn{display:inline-block;padding:10px 16px;border:1px solid var(--verde);background:var(--verde);color:#fff;
+  border-radius:2px;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-weight:600;font-size:14px}
+.btn:hover{background:var(--verde-esc);border-color:var(--verde-esc)}
+.btn.ghost{background:transparent;color:var(--tinta);border-color:var(--linha)}
+.btn.ghost:hover{background:var(--branco);border-color:var(--verde);color:var(--verde-esc)}
+.btn.sm{padding:6px 11px;font-size:13px}
+.hint{font-size:12.5px;color:var(--tinta2);margin-top:14px}
+.err{color:var(--alerta);font-size:12.5px;margin-top:10px;min-height:18px}
+
+/* ---------- cabeçalho ---------- */
+header{border-bottom:1px solid var(--linha);background:var(--papel);position:sticky;top:0;z-index:20}
+.hwrap{max-width:1240px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end}
+.logo{background:var(--logo) no-repeat left center;background-size:contain}
+.lockup{display:flex;align-items:center;gap:12px}
+.lockup .logo{flex:0 0 auto}
+.lockup .mpd{font-family:var(--disp);font-weight:700;color:var(--tinta);line-height:1;
+  border-left:1px solid var(--linha);letter-spacing:.01em;position:relative}
+.brand .logo{width:120px;height:30px}
+.brand .mpd{font-size:23px;padding-left:12px;top:2px}
+.gate-lock{margin-bottom:24px;gap:14px}
+.gate-lock .logo{width:190px;height:47px}
+.gate-lock .mpd{font-size:36px;padding-left:14px;top:3px}
+.sel{display:flex;flex-direction:column;gap:3px}
+.sel label{font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--tinta3);font-weight:600}
+select{font:inherit;padding:6px 8px;border:1px solid var(--linha);background:var(--branco);border-radius:2px;max-width:230px}
+.spacer{flex:1}
+
+nav{border-bottom:1px solid var(--linha);background:var(--papel)}
+.nwrap{max-width:1240px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:11px 14px;
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.07em;font-weight:600;font-size:14.5px;color:var(--tinta3);white-space:nowrap}
+.tab[aria-selected=true]{color:var(--tinta);border-bottom-color:var(--verde)}
+.tab:hover{color:var(--tinta)}
+
+main{max-width:1240px;margin:0 auto;padding:26px 20px 90px}
+.lede{max-width:62ch;color:var(--tinta2);margin:6px 0 24px}
+.panel{display:none}.panel.on{display:block}
+
+/* ---------- perfil (assinatura) ---------- */
+.profile{background:var(--branco);border:1px solid var(--linha);border-radius:3px;overflow:hidden}
+.pf-scroll{overflow-x:auto;overscroll-behavior-x:contain;cursor:grab}
+.pf-scroll.fits{cursor:default}
+.pf-scroll.panning{cursor:grabbing}
+.pf-scroll.panning .pin{pointer-events:none}
+.pf-inner{width:max-content}
+.pf-row{display:flex;border-top:1px solid var(--linha2)}
+.pf-row:first-child{border-top:0}
+.pf-gut{position:sticky;left:0;z-index:3;flex:0 0 104px;padding:10px 10px 10px 14px;
+  border-right:1px solid var(--linha);background:#F5F6F2;box-sizing:border-box}
+.pf-gut .safra{font-family:var(--mono);font-weight:600;font-size:13.5px;letter-spacing:-.02em}
+.pf-gut .meta{font-size:11px;color:var(--tinta3);margin-top:2px;font-family:var(--mono)}
+.pf-gut .curso{display:inline-block;margin-top:5px;font-family:var(--disp);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--verde-esc);border:1px solid var(--verde);
+  padding:0 5px;border-radius:2px;line-height:15px}
+.flag{display:inline-block;margin-top:6px;font-family:var(--disp);font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--alerta);border:1px solid var(--alerta);
+  padding:0 5px;border-radius:2px;background:var(--branco);line-height:16px}
+.ruler{position:relative;height:27px;background:#F5F6F2;flex:0 0 auto;width:calc(var(--mw,110px)*12)}
+.ruler b{position:absolute;top:0;height:100%;box-sizing:border-box;display:flex;align-items:center;
+  padding-left:6px;border-left:1px solid var(--linha2);font-family:var(--disp);font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--tinta3);font-weight:600;white-space:nowrap;overflow:hidden}
+.track{position:relative;flex:0 0 auto;width:calc(var(--mw,110px)*12);height:128px}
+.grid-m{position:absolute;inset:0;pointer-events:none}
+.grid-m i{position:absolute;top:0;bottom:0;width:1px;background:#EEF0EB}
+.band{position:absolute;top:14px;height:26px;border-radius:2px;display:flex;align-items:center;
+  padding:0 7px;overflow:hidden;color:#fff;font-size:11.5px;font-weight:600;white-space:nowrap}
+.band.pousio{background:repeating-linear-gradient(45deg,#B5AFA3 0 5px,#A9A296 5px 10px);color:#F5F3EF}
+.band.cortaEsq{border-radius:0 2px 2px 0;border-left:3px dotted rgba(255,255,255,.85)}
+.band.cortaDir{border-radius:2px 0 0 2px;border-right:3px dotted rgba(255,255,255,.85)}
+.pins{position:absolute;left:0;right:0;top:46px;height:82px}
+.pin.lane2{top:34px}
+.pin{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;
+  gap:2px;background:none;border:0;padding:0;width:56px}
+.pin .stem{width:1px;height:7px;background:var(--linha)}
+.pin .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:-.03em;border:1.5px solid transparent;
+  transition:transform .12s ease}
+.pin .dt{font-family:var(--mono);font-size:9.5px;color:var(--tinta3)}
+.pin:hover .dot{transform:scale(1.14)}
+.pin.sel .dot{box-shadow:0 0 0 2px var(--branco),0 0 0 4px var(--dye)}
+.d-des{background:var(--tinta);color:#fff}
+.d-pre{background:var(--dye);color:#fff}
+.d-pos{background:var(--branco);color:var(--dye);border-color:var(--dye)}
+.d-seq{background:var(--branco);color:var(--dye);border-color:var(--dye);border-style:dashed}
+.d-mec{background:var(--ocre);color:#fff}
+.d-cul{background:var(--aveia);color:#fff}
+
+/* barra de escala */
+.tlbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:12px}
+.selin{display:flex;align-items:center;gap:8px}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.selin label{font-family:var(--disp);text-transform:uppercase;letter-spacing:.09em;font-size:11px;
+  color:var(--tinta3);font-weight:600}
+.chip{font-family:var(--disp);text-transform:uppercase;letter-spacing:.07em;font-size:11.5px;font-weight:600;
+  padding:5px 10px;border:1px solid var(--linha);background:var(--branco);border-radius:2px;color:var(--tinta2)}
+.chip:hover{border-color:var(--verde);color:var(--verde-esc)}
+.winlbl{font-family:var(--mono);font-size:12px;color:var(--tinta3);white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font-size:12px;color:var(--tinta2)}
+.legend b{display:inline-flex;align-items:center;gap:6px;font-weight:400}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.sw.r{border-radius:50%}
+
+/* ---------- detalhe ---------- */
+.detail{margin-top:18px;background:var(--branco);border:1px solid var(--linha);border-radius:3px;padding:18px}
+.detail .empty{color:var(--tinta3);font-size:13px}
+.dt-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;border-bottom:1px solid var(--linha2);padding-bottom:10px;margin-bottom:12px}
+.tag{font-family:var(--disp);text-transform:uppercase;letter-spacing:.07em;font-weight:600;font-size:12px;
+  padding:2px 7px;border-radius:2px;border:1px solid var(--linha)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;
+  color:var(--tinta3);font-weight:600;padding:5px 8px 5px 0;border-bottom:1px solid var(--linha)}
+td{padding:7px 8px 7px 0;border-bottom:1px solid var(--linha2);vertical-align:top}
+.grp{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;padding:1px 5px;
+  border-radius:2px;background:#E4E7F5;color:var(--dye)}
+.grp.rep{background:#F6E3E0;color:var(--alerta)}
+.grp.att{background:#F7EBD5;color:var(--ocre)}
+.att-box{border-left:2px solid var(--laranja);background:#FBF4E6;padding:11px 13px;font-size:13px;margin-top:12px}
+.att-box b,.past-box b{font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+.past-box{border-left:2px solid var(--linha);background:#F3F4F0;padding:11px 13px;font-size:13px;margin-top:12px;color:var(--tinta2)}
+.kv{display:flex;gap:26px;flex-wrap:wrap;margin-top:12px;font-size:13px}
+.kv div span{display:block;font-family:var(--disp);text-transform:uppercase;letter-spacing:.09em;font-size:11px;color:var(--tinta3);font-weight:600}
+.note{margin-top:12px;padding:10px 12px;background:#F3F4F0;border-left:2px solid var(--linha);font-size:13px;color:var(--tinta2)}
+
+/* ---------- fluxograma ---------- */
+.flow{display:flex;flex-direction:column;gap:0}
+.fnode{background:var(--branco);border:1px solid var(--linha);border-left:3px solid var(--linha);border-radius:3px;padding:12px 14px}
+.fnode.t-des{border-left-color:var(--tinta)}
+.fnode.t-pre{border-left-color:var(--dye)}
+.fnode.t-pos,.fnode.t-seq{border-left-color:var(--dye)}
+.fnode.t-mec{border-left-color:var(--ocre)}
+.fnode.t-cul{border-left-color:var(--aveia)}
+.fnode .top{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
+.fdot{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:-.03em;border:1.5px solid transparent}
+.fnode .prods{margin:8px 0 0;padding:0;list-style:none;font-size:13px}
+.fnode .prods li{padding:2px 0}
+.fnode .alvo{font-size:12.5px;color:var(--tinta2);margin-top:6px}
+.conn{display:flex;align-items:center;gap:10px;padding:6px 0 6px 20px;color:var(--tinta3);font-size:12px}
+.conn .bar{width:1px;height:26px;background:var(--linha)}
+.fstage{background:#F3F4F0;border:1px dashed var(--linha);border-radius:3px;padding:9px 14px;font-size:13px}
+.fstage b{font-family:var(--disp);text-transform:uppercase;letter-spacing:.07em;font-size:12.5px}
+
+/* ---------- consulta ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
+.card{background:var(--branco);border:1px solid var(--linha);border-radius:3px;padding:13px 15px}
+.card .n{font-family:var(--disp);font-size:30px;font-weight:700;line-height:1}
+.card .l{font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:11px;color:var(--tinta3);font-weight:600;margin-top:4px}
+.block{background:var(--branco);border:1px solid var(--linha);border-radius:3px;padding:16px 18px;margin-bottom:22px;overflow-x:auto}
+.press{display:inline-flex;gap:2px;vertical-align:middle}
+.press i{width:9px;height:14px;background:var(--linha2);border-radius:1px}
+.press i.on1{background:#BFD3B8}.press i.on2{background:#7FAE72}.press i.on3{background:#3E7D32}
+.moa td{font-family:var(--mono);font-size:12px}
+.warn{border-left:2px solid var(--alerta);background:#FAF0EE;padding:11px 13px;font-size:13px;margin-top:12px}
+.warn b{font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+.ok{border-left:2px solid var(--verde);background:#F0F5EE;padding:11px 13px;font-size:13px;margin-top:12px}
+
+/* ---------- modal ---------- */
+.mask{position:fixed;inset:0;background:rgba(22,36,31,.42);z-index:40;display:grid;place-items:center;padding:20px}
+.mask[hidden]{display:none}
+.modal{background:var(--papel);border:1px solid var(--verde);border-radius:3px;width:100%;max-width:560px;
+  max-height:88vh;overflow-y:auto;padding:20px 22px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.f{display:flex;flex-direction:column;gap:3px}
+.f label{font-family:var(--disp);text-transform:uppercase;letter-spacing:.09em;font-size:11px;color:var(--tinta3);font-weight:600}
+.f input,.f select,.f textarea{font:inherit;padding:7px 8px;border:1px solid var(--linha);background:var(--branco);border-radius:2px;width:100%}
+.f textarea{min-height:56px;resize:vertical}
+.full{grid-column:1/-1}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+textarea.json{width:100%;min-height:180px;font-family:var(--mono);font-size:11.5px;border:1px solid var(--linha);padding:10px;border-radius:2px;background:var(--branco)}
+footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);font-size:12px}
+@media(max-width:640px){
+  h1{font-size:24px}
+  .frow{grid-template-columns:1fr}
+  .pf-gut{flex-basis:78px;padding:9px 8px 9px 10px}
+  .tlbar{gap:9px}
+  .selin label{font-size:10px}
+}
+</style>
+
+<!-- ====================== PORTÃO ====================== -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-lock lockup"><div class="logo" role="img" aria-label="go2apply"></div><span class="mpd">MPD</span></div>
+    <h2 style="margin-bottom:6px">Manejo de plantas daninhas</h2>
+    <p style="color:var(--tinta2);margin:0 0 20px">Histórico de controle de plantas daninhas por talhão. Acesso restrito a clientes da consultoria Equalizagro.</p>
+    <label class="eyebrow" for="code">Código do cliente</label>
+    <input id="code" placeholder="ex.: SRQ-2201" autocomplete="off">
+    <div class="err" id="gerr"></div>
+    <button class="btn" id="enter" style="width:100%">Entrar</button>
+    <p class="hint">Protótipo de demonstração — use <span class="mono">SRQ-2201</span> ou <span class="mono">DEMO</span>. A autenticação de verdade fica no servidor, não aqui.</p>
+  </div>
+</div>
+
+<!-- ====================== APP ====================== -->
+<div id="app" hidden>
+<header>
+  <div class="hwrap">
+    <div class="brand lockup"><div class="logo" role="img" aria-label="go2apply"></div><span class="mpd">MPD</span></div>
+    <div class="sel"><label for="fz">Propriedade</label><select id="fz"></select></div>
+    <div class="sel"><label for="tl">Talhão</label><select id="tl"></select></div>
+    <div class="spacer"></div>
+    <button class="btn sm ghost" id="openAdd">Registrar manejo</button>
+    <button class="btn sm ghost" id="openJson">Dados</button>
+  </div>
+</header>
+
+<nav><div class="nwrap" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="perfil">Perfil histórico</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="fluxo">Fluxograma da safra</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="consulta">Base de consulta</button>
+</div></nav>
+
+<main>
+  <!-- PERFIL -->
+  <section class="panel on" id="p-perfil">
+    <h1 id="h-perfil">Perfil histórico</h1>
+    <p class="lede">Cada faixa é um ciclo agrícola — você escolhe em que mês ele começa. A cor mostra o uso do solo; os marcadores mostram cada manejo aplicado, na data em que aconteceu. Leia de cima para baixo para voltar no tempo e role para o lado para percorrer o ciclo — a coluna dos ciclos fica fixa e todas as faixas correm juntas, então a mesma época aparece sempre alinhada de um ano para o outro.</p>
+    <div class="tlbar">
+      <div class="selin"><label for="mstart">Ciclo começa em</label><select id="mstart"></select></div>
+      <div class="selin"><label>Escala</label><div class="chips" id="escala">
+        <button class="chip" data-w="70">Compacta</button>
+        <button class="chip" data-w="110">Padrão</button>
+        <button class="chip" data-w="180">Detalhada</button>
+        <button class="chip" data-w="270">Dia a dia</button>
+      </div></div>
+      <div class="selin"><label>Ir para</label><div class="chips" id="irpara"></div></div>
+      <span class="winlbl" id="eixo"></span>
+    </div>
+    <div class="profile"><div class="pf-scroll" id="pfScroll"><div class="pf-inner" id="pf"></div></div></div>
+    <div class="legend" id="legend"></div>
+    <div class="detail" id="detail"><p class="empty">Clique em um marcador para ver produtos, doses, alvos e resultado da aplicação.</p></div>
+  </section>
+
+  <!-- FLUXO -->
+  <section class="panel" id="p-fluxo">
+    <h1>Fluxograma da safra</h1>
+    <p class="lede">A mesma informação lida como sequência de decisões: o que veio antes, quanto tempo depois veio o próximo manejo e o que cada etapa controlou.</p>
+    <div class="sel" style="margin-bottom:20px;max-width:200px"><label for="sf">Ciclo</label><select id="sf"></select></div>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <!-- CONSULTA -->
+  <section class="panel" id="p-consulta">
+    <h1>Base de consulta</h1>
+    <p class="lede">Leitura agregada do talhão: quanto se aplicou, contra quem, com quais mecanismos de ação e onde a rotação está falhando.</p>
+    <div class="cards" id="cards"></div>
+    <div class="block">
+      <h3 style="margin-bottom:4px">Pressão por espécie</h3>
+      <p style="color:var(--tinta2);font-size:13px;margin:0 0 14px">Nível registrado nas visitas de campo em cada ano agrícola.</p>
+      <div id="press"></div>
+    </div>
+    <div class="block">
+      <h3 style="margin-bottom:4px">Rotação de mecanismos de ação</h3>
+      <p style="color:var(--tinta2);font-size:13px;margin:0 0 14px">Grupos HRAC usados por ano. Em vermelho, o grupo repetido em três anos seguidos ou mais — o cenário que seleciona resistência.</p>
+      <div id="moa"></div>
+      <div id="moaMsg"></div>
+    </div>
+    <div class="block">
+      <h3 style="margin-bottom:14px">Ingredientes ativos no histórico</h3>
+      <div id="ias"></div>
+    </div>
+  </section>
+</main>
+
+<footer>Protótipo de demonstração. Dados de exemplo, não constituem recomendação agronômica. Toda aplicação exige receituário emitido por profissional habilitado.</footer>
+</div>
+
+<!-- modais -->
+<div class="mask" id="mAdd" hidden><div class="modal">
+  <h2>Registrar manejo</h2>
+  <p style="color:var(--tinta2);font-size:13px;margin:6px 0 0">Entra no talhão e no ano agrícola correspondentes à data informada.</p>
+  <div class="frow">
+    <div class="f"><label for="a-data">Data</label><input type="date" id="a-data"></div>
+    <div class="f"><label for="a-tipo">Tipo de manejo</label><select id="a-tipo">
+      <option value="des">Dessecação de manejo</option>
+      <option value="pre">Pré-emergente</option>
+      <option value="pos">Pós-emergente</option>
+      <option value="seq">Sequencial / repasse</option>
+      <option value="mec">Mecânico / catação</option>
+      <option value="cul">Cultural / cobertura</option>
+    </select></div>
+    <div class="f full"><label for="a-alvo">Alvos (separados por vírgula)</label><input id="a-alvo" placeholder="buva, capim-amargoso"></div>
+    <div class="f full"><label for="a-prod">Produtos — um por linha: nome | ingrediente ativo | dose | grupo HRAC</label>
+      <textarea id="a-prod" placeholder="Boral 500 SC | sulfentrazona | 0,8 L/ha | 14&#10;Glifosato 480 | glifosato | 3,0 L/ha | 9"></textarea></div>
+    <div class="f"><label for="a-efic">Eficácia observada (%)</label><input type="number" id="a-efic" min="0" max="100" placeholder="85"></div>
+    <div class="f"><label for="a-obs">Observação de campo</label><input id="a-obs" placeholder="escape em reboleiras"></div>
+  </div>
+  <div class="err" id="aerr"></div>
+  <div class="acts"><button class="btn ghost sm" data-close="mAdd">Cancelar</button><button class="btn sm" id="saveAdd">Salvar manejo</button></div>
+</div></div>
+
+<div class="mask" id="mJson" hidden><div class="modal">
+  <h2>Dados do talhão</h2>
+  <p style="color:var(--tinta2);font-size:13px;margin:6px 0 12px">Copie para guardar, ou cole um histórico e substitua o que está carregado.</p>
+  <textarea class="json" id="jsonBox" spellcheck="false"></textarea>
+  <div class="err" id="jerr"></div>
+  <div class="acts">
+    <button class="btn ghost sm" data-close="mJson">Fechar</button>
+    <button class="btn ghost sm" id="copyJson">Copiar</button>
+    <button class="btn sm" id="loadJson">Carregar colado</button>
+  </div>
+</div></div>
+
+<script>
+/* ===================== dados de exemplo ===================== */
+const MES = ["Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar"];
+const TIPO = {
+  des:{ab:"DES",nome:"Dessecação de manejo",cls:"d-des"},
+  pre:{ab:"PRÉ",nome:"Pré-emergente",cls:"d-pre"},
+  pos:{ab:"PÓS",nome:"Pós-emergente",cls:"d-pos"},
+  seq:{ab:"SEQ",nome:"Sequencial / repasse",cls:"d-seq"},
+  mec:{ab:"MEC",nome:"Mecânico / catação",cls:"d-mec"},
+  cul:{ab:"CUL",nome:"Cultural / cobertura",cls:"d-cul"}
+};
+const CULT = {
+  soja:{n:"Soja",c:"var(--soja)"}, trigo:{n:"Trigo",c:"var(--trigo)"},
+  aveia:{n:"Aveia preta",c:"var(--aveia)"}, milho:{n:"Milho",c:"var(--milho)"},
+  cobertura:{n:"Cobertura consorciada",c:"var(--cobertura)"}, pousio:{n:"Pousio",c:"var(--pousio)"}
+};
+const HRAC = {1:"ACCase",2:"ALS",4:"Auxínico",5:"FSII (triazina)",6:"FSII (nitrila)",
+  9:"EPSPS",10:"GS",14:"PPO",15:"VLCFA",27:"HPPD",22:"FSI"};
+
+function op(data,tipo,alvos,prods,efic,obs){
+  return {data,tipo,alvos,prods:prods.map(p=>({nome:p[0],ia:p[1],dose:p[2],hrac:p[3]})),efic,obs};
+}
+const P={nome:"Fazenda São Roque",mun:"Cruz Alta / RS",talhoes:[]};
+
+/* ---- Talhão 1 — Coxilha: dependência de glifosato → virada de estratégia ---- */
+P.talhoes.push({id:"T1",nome:"T1 — Coxilha",ha:82,solo:"Latossolo vermelho, argiloso",safras:[
+ {safra:"2021/22",uso:[["aveia","2021-04-20","2021-09-25"],["soja","2021-11-05","2022-04-02"]],
+  pressao:{buva:2,"capim-amargoso":1,azevem:1},
+  ops:[
+   op("2021-09-28","des",["buva","azevém"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["DMA 806 BR","2,4-D","1,0 L/ha",4]],88,"Aveia bem fechada, pouca daninha em pé."),
+   op("2021-11-02","des",["buva"],[["Glifosato 480 SL","glifosato","2,5 L/ha",9]],85,"Dessecação de pré-semeadura."),
+   op("2021-12-18","pos",["capim-amargoso","leiteiro"],[["Glifosato 480 SL","glifosato","2,0 L/ha",9]],80,"Soja RR em V6.")
+  ]},
+ {safra:"2022/23",uso:[["trigo","2022-06-15","2022-11-28"],["soja","2022-12-05","2023-04-10"]],
+  pressao:{buva:3,"capim-amargoso":2,azevem:2},
+  ops:[
+   op("2022-06-05","des",["azevém","buva"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9]],72,"Azevém rebrotou em 20 dias — primeira suspeita de falha."),
+   op("2022-08-12","pos",["azevém"],[["Hussar Plus","iodosulfurom","110 g/ha",2]],65,"Controle irregular no trigo."),
+   op("2022-11-30","des",["buva","capim-amargoso"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["DMA 806 BR","2,4-D","1,2 L/ha",4]],70,"Buva de porte alto, rebrote forte."),
+   op("2022-12-22","pos",["capim-amargoso"],[["Glifosato 480 SL","glifosato","2,5 L/ha",9]],60,"Escape claro de amargoso."),
+   op("2023-01-14","seq",["capim-amargoso"],[["Select 240 EC","cletodim","0,45 L/ha",1]],78,"Repasse dirigido às reboleiras.")
+  ]},
+ {safra:"2023/24",uso:[["aveia","2023-04-25","2023-09-20"],["soja","2023-11-08","2024-03-28"]],
+  pressao:{buva:3,"capim-amargoso":3,azevem:2,caruru:1},
+  ops:[
+   op("2023-09-22","des",["azevém","buva"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["Zamba","amônio-glufosinato","2,0 L/ha",10]],90,"Entrada do grupo 10 na dessecação."),
+   op("2023-10-30","pre",["buva","capim-amargoso","caruru"],[["Boral 500 SC","sulfentrazona","0,8 L/ha",14],["Dual Gold","s-metolacloro","1,2 L/ha",15]],0,"Primeiro pré-emergente do talhão. Aplicado sobre palhada, chuva de 24 mm em 3 dias."),
+   op("2023-11-06","des",["buva"],[["Glifosato 480 SL","glifosato","2,5 L/ha",9],["DMA 806 BR","2,4-D","1,0 L/ha",4]],86,"Pré-semeadura."),
+   op("2023-12-20","pos",["capim-amargoso"],[["Verdict R","haloxifope","0,5 L/ha",1]],82,"Amargoso já perenizado em parte da área."),
+   op("2024-01-08","mec",["capim-amargoso"],[],95,"Catação manual nas reboleiras de touceira — 6 h/ha em 12 ha.")
+  ]},
+ {safra:"2024/25",uso:[["trigo","2024-06-20","2024-11-25"],["soja","2024-12-02","2025-04-05"]],
+  pressao:{buva:2,"capim-amargoso":2,azevem:3},
+  ops:[
+   op("2024-06-08","des",["azevém"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["Zamba","amônio-glufosinato","2,0 L/ha",10]],80,"Azevém denso na entrada do trigo."),
+   op("2024-08-20","pos",["azevém"],[["Axial","pinoxaden","0,5 L/ha",1]],55,"Falha evidente. Suspeita de azevém resistente a ACCase — coleta de sementes enviada para teste."),
+   op("2024-11-28","pre",["buva","capim-amargoso","caruru"],[["Flumyzin 500","flumioxazina","100 g/ha",14],["Yamato","pyroxasulfone","120 g/ha",15]],0,"Pré em pré-semeadura, palhada de trigo bem distribuída."),
+   op("2024-12-04","des",["buva"],[["Glifosato 480 SL","glifosato","2,5 L/ha",9],["Zamba","amônio-glufosinato","2,0 L/ha",10]],92,""),
+   op("2025-01-10","pos",["caruru","leiteiro"],[["Flex","fomesafem","1,0 L/ha",14]],88,"")
+  ]},
+ {safra:"2025/26",uso:[["aveia","2025-04-18","2025-10-05"],["soja","2025-11-10","2026-03-30"]],
+  pressao:{buva:1,"capim-amargoso":1,azevem:2},
+  ops:[
+   op("2025-04-18","cul",["azevém","buva"],[],0,"Aveia preta 80 kg/ha em linha cruzada, objetivo de fechar antes de junho e suprimir azevém por sombreamento."),
+   op("2025-10-08","des",["azevém"],[["Zamba","amônio-glufosinato","2,0 L/ha",10],["Glifosato 480 SL","glifosato","2,0 L/ha",9]],93,"Azevém em pré-florescimento, sem produção de semente."),
+   op("2025-11-02","pre",["buva","capim-amargoso","caruru"],[["Spider 840 WG","diclosulam","35 g/ha",2],["Yamato","pyroxasulfone","120 g/ha",15]],0,"Troca do grupo 14 pelo 2 no residual, para não repetir mecanismo do ano anterior."),
+   op("2026-01-05","pos",["caruru"],[["Cobra","lactofem","0,25 L/ha",14]],90,"Área limpa, aplicação pontual.")
+  ]}
+]});
+
+/* ---- Talhão 4 — Várzea: pousio de inverno, capim-arroz ---- */
+P.talhoes.push({id:"T4",nome:"T4 — Várzea",ha:45,solo:"Planossolo, drenagem lenta",safras:[
+ {safra:"2021/22",uso:[["pousio","2021-04-15","2021-11-10"],["soja","2021-11-20","2022-04-08"]],
+  pressao:{"capim-arroz":2,caruru:2,azevem:1},
+  ops:[
+   op("2021-11-12","des",["capim-arroz","caruru"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9]],75,"Pousio sujo, muita massa verde."),
+   op("2022-01-05","pos",["capim-arroz"],[["Glifosato 480 SL","glifosato","2,0 L/ha",9]],70,"")
+  ]},
+ {safra:"2022/23",uso:[["pousio","2022-04-12","2022-11-15"],["soja","2022-11-25","2023-04-12"]],
+  pressao:{"capim-arroz":3,caruru:2},
+  ops:[
+   op("2022-11-16","des",["capim-arroz","caruru"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["DMA 806 BR","2,4-D","1,0 L/ha",4]],78,""),
+   op("2022-12-28","pos",["capim-arroz"],[["Select 240 EC","cletodim","0,4 L/ha",1]],85,""),
+   op("2023-02-02","seq",["caruru"],[["Flex","fomesafem","0,8 L/ha",14]],82,"")
+  ]},
+ {safra:"2023/24",uso:[["pousio","2023-04-10","2023-11-05"],["soja","2023-11-18","2024-04-02"]],
+  pressao:{"capim-arroz":2,caruru:2,azevem:2},
+  ops:[
+   op("2023-11-06","des",["capim-arroz"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9]],80,""),
+   op("2023-11-15","pre",["capim-arroz","caruru"],[["Dual Gold","s-metolacloro","1,4 L/ha",15]],0,"Residual para escalonar emergência de capim-arroz."),
+   op("2024-01-12","pos",["caruru"],[["Flex","fomesafem","1,0 L/ha",14]],86,"")
+  ]},
+ {safra:"2024/25",uso:[["aveia","2024-05-05","2024-09-30"],["soja","2024-11-22","2025-04-06"]],
+  pressao:{"capim-arroz":1,caruru:1,azevem:1},
+  ops:[
+   op("2024-05-05","cul",["capim-arroz","azevém"],[],0,"Primeira cobertura de inverno na várzea, após ajuste de drenagem."),
+   op("2024-10-02","des",["azevém"],[["Zamba","amônio-glufosinato","1,8 L/ha",10]],88,""),
+   op("2024-11-18","pre",["capim-arroz","caruru"],[["Boral 500 SC","sulfentrazona","0,7 L/ha",14],["Dual Gold","s-metolacloro","1,2 L/ha",15]],0,""),
+   op("2025-01-15","pos",["capim-arroz"],[["Verdict R","haloxifope","0,4 L/ha",1]],90,"")
+  ]},
+ {safra:"2025/26",uso:[["aveia","2025-04-28","2025-10-02"],["soja","2025-11-15","2026-04-01"]],
+  pressao:{"capim-arroz":1,caruru:1},
+  ops:[
+   op("2025-04-28","cul",["capim-arroz"],[],0,"Aveia + nabo, 2ª safra de cobertura."),
+   op("2025-10-05","des",["azevém","caruru"],[["Zamba","amônio-glufosinato","2,0 L/ha",10],["Glifosato 480 SL","glifosato","2,0 L/ha",9]],91,""),
+   op("2025-11-10","pre",["capim-arroz","caruru"],[["Spider 840 WG","diclosulam","30 g/ha",2],["Yamato","pyroxasulfone","110 g/ha",15]],0,"")
+  ]}
+]});
+
+/* ---- Talhão 7 — Sanga: entrou em 2023, milho na rotação ---- */
+P.talhoes.push({id:"T7",nome:"T7 — Sanga",ha:63,solo:"Latossolo, relevo ondulado",safras:[
+ {safra:"2023/24",uso:[["aveia","2023-04-22","2023-08-25"],["milho","2023-09-05","2024-02-20"]],
+  pressao:{buva:3,"capim-amargoso":3,"capim-branco":2},
+  ops:[
+   op("2023-08-28","des",["buva","capim-amargoso"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["DMA 806 BR","2,4-D","1,5 L/ha",4]],82,"Talhão recém-arrendado, histórico anterior desconhecido."),
+   op("2023-09-06","pre",["capim-amargoso","capim-branco"],[["Primestra Gold","atrazina + s-metolacloro","4,5 L/ha","5+15"]],0,"Pré no milho."),
+   op("2023-10-10","pos",["capim-amargoso","caruru"],[["Soberan","tembotriona","0,25 L/ha",27],["Sanson","nicossulfurom","1,0 L/ha",2]],89,"Milho V4."),
+   op("2023-12-05","mec",["capim-amargoso"],[],92,"Roçada nas bordas e carreadores.")
+  ]},
+ {safra:"2024/25",uso:[["trigo","2024-06-18","2024-11-20"],["soja","2024-12-01","2025-04-04"]],
+  pressao:{buva:2,"capim-amargoso":2,azevem:2,"capim-branco":1},
+  ops:[
+   op("2024-06-06","des",["azevém","buva"],[["Glifosato 480 SL","glifosato","3,0 L/ha",9],["Zamba","amônio-glufosinato","2,0 L/ha",10]],86,""),
+   op("2024-08-15","pos",["azevém","nabiça"],[["Hussar Plus","iodosulfurom","110 g/ha",2],["DMA 806 BR","2,4-D","0,8 L/ha",4]],80,""),
+   op("2024-11-26","pre",["buva","capim-amargoso"],[["Boral 500 SC","sulfentrazona","0,9 L/ha",14],["Yamato","pyroxasulfone","120 g/ha",15]],0,""),
+   op("2024-12-03","des",["buva"],[["Glifosato 480 SL","glifosato","2,5 L/ha",9],["Zamba","amônio-glufosinato","2,0 L/ha",10]],90,""),
+   op("2025-01-20","pos",["capim-amargoso"],[["Select 240 EC","cletodim","0,45 L/ha",1]],87,"")
+  ]},
+ {safra:"2025/26",uso:[["cobertura","2025-04-20","2025-10-10"],["soja","2025-11-12","2026-03-29"]],
+  pressao:{buva:1,"capim-amargoso":1,azevem:1},
+  ops:[
+   op("2025-04-20","cul",["buva","capim-amargoso"],[],0,"Consórcio aveia + nabo + ervilhaca, meta de 6 t/ha de matéria seca."),
+   op("2025-10-12","des",["azevém","buva"],[["Zamba","amônio-glufosinato","2,0 L/ha",10]],94,"Sem glifosato nesta dessecação, para aliviar a pressão sobre o grupo 9."),
+   op("2025-11-05","pre",["buva","capim-amargoso"],[["Spider 840 WG","diclosulam","35 g/ha",2],["Dual Gold","s-metolacloro","1,2 L/ha",15]],0,""),
+   op("2026-01-12","pos",["caruru"],[["Flex","fomesafem","0,8 L/ha",14]],91,"")
+  ]}
+]});
+
+/* ===================== achatar os dados de exemplo ===================== */
+/* os ciclos passam a ser calculados na hora, a partir do mês inicial escolhido */
+P.talhoes.forEach(t=>{
+  t.ops=[];t.uso=[];t.pressao={};
+  t.safras.forEach(s=>{t.ops.push(...s.ops);t.uso.push(...s.uso);t.pressao[s.safra]=s.pressao||{}});
+  delete t.safras;
+});
+
+/* ===================== estado ===================== */
+let cur=0, selKey=null, MW=110, START=3;   /* MW = largura do mês em px, START = 0 jan … 3 abr */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const T=()=>P.talhoes[cur];
+const MESES=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MESL=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const DD=[31,28,31,30,31,30,31,31,30,31,30,31];
+
+/* ===================== utilidades ===================== */
+function MB(){                                   /* os 12 meses na ordem do eixo, em % do ciclo */
+  const a=[];let tot=0;
+  for(let k=0;k<12;k++){const m=(START+k)%12;a.push({m,n:MESES[m],d:DD[m]});tot+=DD[m]}
+  let c=0;a.forEach(x=>{x.a=c/tot*100;c+=x.d;x.b=c/tot*100});
+  return a;
+}
+function D(iso){return new Date(iso+"T12:00:00")}
+function anoCiclo(iso){const d=D(iso);return d.getMonth()>=START?d.getFullYear():d.getFullYear()-1}
+function tagCiclo(y){return START===0?String(y):y+"/"+String(y+1).slice(2)}
+function fmt(iso){const[y,m,d]=iso.split("-");return d+"/"+m+"/"+y.slice(2)}
+function fmtLong(iso){const[y,m,d]=iso.split("-");return d+" "+MESES[+m-1].toLowerCase()+" "+y}
+function dias(a,b){return Math.round((D(b)-D(a))/864e5)}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function grupos(o){const g=[];o.prods.forEach(p=>String(p.hrac).split("+").forEach(x=>{const v=x.trim();if(v&&!g.includes(v))g.push(v)}));return g}
+
+/* ===================== ciclos ===================== */
+function ciclos(t){
+  const todas=[...t.ops.map(o=>o.data), ...t.uso.flatMap(u=>[u[1],u[2]])];
+  if(!todas.length)return [];
+  const anos=todas.map(anoCiclo), y0=Math.min(...anos), y1=Math.max(...anos), out=[];
+  for(let y=y0;y<=y1;y++){
+    const a=new Date(y,START,1), b=new Date(y+1,START,1), span=b-a;
+    const uso=[];
+    t.uso.forEach(([c,i,f])=>{
+      const s=Math.max(D(i),a), e=Math.min(D(f),b-864e5);
+      if(e-s>4*864e5)uso.push({c,a:(s-a)/span*100,b:(e-a)/span*100,i,f,cl:D(i)<a,cr:D(f)>b-864e5});
+    });
+    const ops=t.ops.filter(o=>anoCiclo(o.data)===y).sort((x,z)=>x.data<z.data?-1:1)
+      .map(o=>({...o,p:(D(o.data)-a)/span*100}));
+    if(!uso.length&&!ops.length)continue;
+    const hoje=Date.now();
+    out.push({tag:tagCiclo(y),y,uso,ops,pressao:t.pressao[tagCiclo(y)]||{},curso:hoje>=+a&&hoje<+b});
+  }
+  return out;
+}
+
+/* rotação de mecanismos: critico 4+ anos seguidos ativos, atencao 3, passado já interrompido */
+function analiseMoa(cs){
+  const seq=cs.map(c=>{const g=new Set();c.ops.forEach(o=>grupos(o).forEach(x=>g.add(x)));return g});
+  const all=new Set();seq.forEach(s=>s.forEach(x=>all.add(x)));
+  const r={};
+  all.forEach(g=>{
+    let run=0,max=0;
+    seq.forEach(s=>{run=s.has(g)?run+1:0;max=Math.max(max,run)});
+    const nivel=run>=4?"critico":run===3?"atencao":(max>=3?"passado":null);
+    if(nivel)r[g]={max,cur:run,nivel};
+  });
+  return r;
+}
+const NIVEL={critico:"rep",atencao:"att",passado:""};
+function clsGrupo(risco,g){const x=risco[g];return x?" "+NIVEL[x.nivel]:""}
+
+/* ===================== perfil histórico ===================== */
+function drawPerfil(){
+  const t=T(),cs=ciclos(t),risco=analiseMoa(cs),mb=MB(),total=MW*12;
+  const ruler=`<div class="ruler">`+mb.map(m=>
+    `<b style="left:${m.a}%;width:${m.b-m.a}%">${MW<70?m.n[0]:m.n}</b>`).join("")+`</div>`;
+  const grid=mb.map(m=>`<i style="left:${m.a}%"></i>`).join("");
+  const head=`<div class="pf-row head"><div class="pf-gut"><div class="eyebrow">Ciclo</div></div>${ruler}</div>`;
+  let h=head;
+  [...cs].reverse().forEach(c=>{
+    const bands=c.uso.map(u=>{
+      const cu=CULT[u.c],w=Math.max(0.6,u.b-u.a);
+      return `<div class="band${u.c==="pousio"?" pousio":""}${u.cl?" cortaEsq":""}${u.cr?" cortaDir":""}" style="left:${u.a}%;width:${w}%;${u.c==="pousio"?"":"background:"+cu.c}"
+        title="${cu.n}: ${fmt(u.i)} a ${fmt(u.f)}">${cu.n}</div>`;
+    }).join("");
+    let last=-1e4;
+    const pins=c.ops.map((o,i)=>{
+      const x=Math.max(16,Math.min(total-16,o.p/100*total)), lane=(x-last<56)?" lane2":"";
+      if(!lane)last=x;
+      const T2=TIPO[o.tipo];
+      return `<button class="pin${lane}${selKey===c.tag+"|"+i?" sel":""}" style="left:${x.toFixed(1)}px"
+        data-s="${c.tag}" data-i="${i}" aria-label="${T2.nome} em ${fmtLong(o.data)}">
+        <span class="stem"></span><span class="dot ${T2.cls}">${T2.ab}</span><span class="dt">${fmt(o.data).slice(0,5)}</span></button>`;
+    }).join("");
+    const nAp=c.ops.filter(o=>o.prods.length).length;
+    const gs=new Set();c.ops.forEach(o=>grupos(o).forEach(g=>gs.add(g)));
+    const rep=[...gs].filter(g=>risco[g]&&risco[g].nivel==="critico");
+    h+=`<div class="pf-row"><div class="pf-gut">
+      <div class="safra">${c.tag}</div><div class="meta">${nAp} apl · ${gs.size} grupos</div>
+      ${c.curso?'<div class="curso">em curso</div>':""}
+      ${rep.length?`<div class="flag" title="Grupo ${rep.join(", ")} usado em 4 anos seguidos ou mais">G${rep.join("·")}</div>`:""}</div>
+      <div class="track"><div class="grid-m">${grid}</div>${bands}<div class="pins">${pins}</div></div></div>`;
+  });
+  h+=head.replace('class="pf-row head"','class="pf-row foot"');
+  const pf=$("#pf");
+  pf.style.setProperty("--mw",MW+"px");
+  pf.innerHTML=h;
+  $("#h-perfil").textContent=t.nome;
+  $("#eixo").textContent=`eixo de ${MESL[START]} a ${MESL[(START+11)%12]} · ${cs.length} ciclos · ${MW} px por mês`;
+  $("#irpara").innerHTML=[0,3,6,9].map(k=>{const m=(START+k)%12;
+    return `<button class="chip" data-m="${m}">${MESES[m]}</button>`}).join("");
+  const sc=$("#pfScroll");sc.classList.toggle("fits",sc.scrollWidth<=sc.clientWidth);
+  $$("#pf .pin").forEach(b=>b.onclick=()=>{
+    $$("#pf .pin").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");
+    selKey=b.dataset.s+"|"+b.dataset.i;
+    showDetail(b.dataset.s,+b.dataset.i);
+  });
+  const cu=Object.entries(CULT).map(([k,v])=>`<b><span class="sw" style="background:${k==="pousio"?"repeating-linear-gradient(45deg,#B5AFA3 0 3px,#A9A296 3px 6px)":v.c}"></span>${v.n}</b>`).join("");
+  const tp=Object.values(TIPO).map(v=>`<b><span class="sw r ${v.cls}" style="border-width:1.5px;border-style:solid"></span>${v.nome}</b>`).join("");
+  $("#legend").innerHTML=cu+tp;
+}
+
+function showDetail(tag,i){
+  const t=T(),cs=ciclos(t),c=cs.find(x=>x.tag===tag);if(!c)return;
+  const o=c.ops[i];if(!o)return;
+  const risco=analiseMoa(cs),T2=TIPO[o.tipo];
+  const uso=c.uso.find(u=>o.data>=u.i&&o.data<=u.f);
+  let h=`<div class="dt-head"><h3>${T2.nome}</h3>
+    <span class="mono" style="font-size:13px">${fmtLong(o.data)}</span>
+    <span class="tag">${tag}</span>
+    ${uso?`<span class="tag" style="border-color:${CULT[uso.c].c};color:${CULT[uso.c].c}">${CULT[uso.c].n}</span>`:'<span class="tag">entressafra</span>'}</div>`;
+  if(o.prods.length){
+    h+=`<table><thead><tr><th>Produto</th><th>Ingrediente ativo</th><th>Dose</th><th>Grupo HRAC</th></tr></thead><tbody>`
+      +o.prods.map(p=>{
+        const gs=String(p.hrac).split("+").map(x=>x.trim()).filter(Boolean);
+        return `<tr><td>${esc(p.nome)}</td><td>${esc(p.ia)}</td><td class="mono">${esc(p.dose)}</td>
+        <td>${gs.map(g=>`<span class="grp${clsGrupo(risco,g)}" title="${HRAC[g]||""}">${g} · ${HRAC[g]||"—"}</span>`).join(" ")||"—"}</td></tr>`}).join("")
+      +`</tbody></table>`;
+  }else h+=`<p style="font-size:13px;color:var(--tinta2);margin:0">Manejo sem aplicação de herbicida.</p>`;
+  h+=`<div class="kv"><div><span>Alvos</span>${o.alvos.map(cap).join(", ")||"—"}</div>
+    ${o.prods.length||o.tipo==="mec"?`<div><span>Eficácia observada</span>${o.efic?o.efic+"%":"—"}</div>`:""}
+    <div><span>Área</span>${t.ha} ha</div></div>`;
+  if(o.obs)h+=`<div class="note">${esc(o.obs)}</div>`;
+  $("#detail").innerHTML=h;
+}
+
+/* ===================== fluxograma ===================== */
+function fillCiclos(){
+  const cs=ciclos(T());
+  $("#sf").innerHTML=[...cs].reverse().map(c=>`<option value="${c.tag}">${c.tag}</option>`).join("");
+  if(cs.length)$("#sf").value=cs[cs.length-1].tag;
+}
+function drawFluxo(){
+  const t=T(),cs=ciclos(t);
+  const c=cs.find(x=>x.tag===$("#sf").value)||cs[cs.length-1];
+  if(!c){$("#flow").innerHTML="";return}
+  const risco=analiseMoa(cs),evs=[];
+  c.uso.forEach(u=>{
+    if(u.a>0.4)evs.push({d:u.i,k:"stage",txt:`Implantação — <b>${CULT[u.c].n}</b>`});
+    if(u.b<99.6)evs.push({d:u.f,k:"stage",txt:`Colheita / encerramento — <b>${CULT[u.c].n}</b>`});
+  });
+  c.ops.forEach(o=>evs.push({d:o.data,k:"op",o}));
+  evs.sort((a,b)=>a.d<b.d?-1:(a.d>b.d?1:(a.k==="stage"?-1:1)));
+  let h="",prev=null;
+  evs.forEach(e=>{
+    if(prev){const dd=dias(prev,e.d);
+      h+=`<div class="conn"><div class="bar"></div>${dd>0?`<span class="mono">+${dd} dias</span>`:""}</div>`}
+    prev=e.d;
+    if(e.k==="stage"){h+=`<div class="fstage"><span class="mono" style="color:var(--tinta3)">${fmt(e.d)}</span> &nbsp; ${e.txt}</div>`;return}
+    const o=e.o,T2=TIPO[o.tipo];
+    h+=`<div class="fnode t-${o.tipo}"><div class="top">
+      <span class="fdot ${T2.cls}">${T2.ab}</span>
+      <h3 style="font-size:15px">${T2.nome}</h3>
+      <span class="mono" style="color:var(--tinta3)">${fmt(o.data)}</span>
+      ${o.efic?`<span class="mono" style="margin-left:auto;color:${o.efic<70?"var(--alerta)":"var(--tinta2)"}">eficácia ${o.efic}%</span>`:""}
+    </div>`;
+    if(o.prods.length)h+=`<ul class="prods">${o.prods.map(p=>{
+      const gs=String(p.hrac).split("+").map(x=>x.trim()).filter(Boolean);
+      return `<li>${esc(p.nome)} <span style="color:var(--tinta2)">(${esc(p.ia)})</span> — <span class="mono">${esc(p.dose)}</span> ${gs.map(g=>`<span class="grp${clsGrupo(risco,g)}">${g}</span>`).join("")}</li>`}).join("")}</ul>`;
+    if(o.alvos.length)h+=`<div class="alvo"><b>Alvo:</b> ${o.alvos.map(cap).join(", ")}</div>`;
+    if(o.obs)h+=`<div class="note" style="margin-top:9px">${esc(o.obs)}</div>`;
+    h+=`</div>`;
+  });
+  $("#flow").innerHTML=h;
+}
+
+/* ===================== base de consulta ===================== */
+function drawConsulta(){
+  const t=T(),cs=ciclos(t),risco=analiseMoa(cs),nS=cs.length||1;
+  let apl=0,ias=new Map(),grps=new Set(),comRes=0;
+  cs.forEach(c=>c.ops.forEach(o=>{
+    if(o.prods.length)apl++;
+    if(o.tipo==="pre")comRes++;
+    o.prods.forEach(p=>ias.set(p.ia,(ias.get(p.ia)||0)+1));
+    grupos(o).forEach(g=>grps.add(g));
+  }));
+  $("#cards").innerHTML=[
+    [cs.length,"ciclos no histórico"],
+    [(apl/nS).toFixed(1),"aplicações / ciclo"],
+    [ias.size,"ingredientes ativos"],
+    [grps.size,"grupos HRAC"],
+    [comRes,"usos de pré-emergente"],
+    [Object.values(risco).filter(x=>x.nivel!=="passado").length,"grupos sob alerta"]
+  ].map(([n,l])=>`<div class="card"><div class="n"${l==="grupos sob alerta"&&n>0?' style="color:var(--alerta)"':""}>${n}</div><div class="l">${l}</div></div>`).join("");
+
+  const esp=new Set();cs.forEach(c=>Object.keys(c.pressao).forEach(e=>esp.add(e)));
+  let h=`<table><thead><tr><th>Espécie</th>${cs.map(c=>`<th style="text-align:center">${c.tag}</th>`).join("")}</tr></thead><tbody>`;
+  [...esp].forEach(e=>{
+    h+=`<tr><td style="white-space:nowrap">${cap(e)}</td>`+cs.map(c=>{
+      const v=c.pressao[e]||0;
+      return `<td style="text-align:center"><span class="press" title="${["ausente","baixa","média","alta"][v]}">${[1,2,3].map(i=>`<i class="${v>=i?"on"+v:""}"></i>`).join("")}</span></td>`;
+    }).join("")+`</tr>`;
+  });
+  $("#press").innerHTML=(esp.size?h+`</tbody></table>`:`<p style="color:var(--tinta3);font-size:13px;margin:0">Sem registro de pressão para este talhão.</p>`)
+    +(esp.size?`<p style="font-size:12px;color:var(--tinta3);margin:10px 0 0">Escala: 1 baixa · 2 média · 3 alta</p>`:"");
+
+  let m=`<table class="moa"><thead><tr><th>Ciclo</th><th>Grupos HRAC aplicados</th><th>Nº de grupos</th></tr></thead><tbody>`;
+  [...cs].reverse().forEach(c=>{
+    const g=new Set();c.ops.forEach(o=>grupos(o).forEach(x=>g.add(x)));
+    const arr=[...g].sort((a,b)=>a-b);
+    m+=`<tr><td>${c.tag}</td><td>${arr.length?arr.map(x=>`<span class="grp${clsGrupo(risco,x)}" title="${HRAC[x]||""}">${x} · ${HRAC[x]||"—"}</span>`).join(" "):"<span style='color:var(--tinta3)'>nenhum</span>"}</td><td>${arr.length}</td></tr>`;
+  });
+  $("#moa").innerHTML=m+`</tbody></table>`;
+
+  const rs=Object.entries(risco).sort((a,b)=>b[1].cur-a[1].cur);
+  const nome=g=>`Grupo ${g} — ${HRAC[g]||"mecanismo não catalogado"}`;
+  let msg=rs.filter(([,x])=>x.nivel==="critico").map(([g,x])=>
+    `<div class="warn"><b>${nome(g)} · sequência ativa de ${x.cur} ciclos</b><br>
+     Este é o mecanismo mais repetido do talhão e a sequência continua no ciclo atual. Repetição prolongada é o principal fator de seleção de biótipos resistentes — vale prever substituição já no próximo ciclo e conferir, no perfil histórico, se alguma aplicação com este grupo já apresentou eficácia abaixo de 70%.</div>`).join("");
+  msg+=rs.filter(([,x])=>x.nivel==="atencao").map(([g])=>
+    `<div class="att-box"><b>${nome(g)} · 3 ciclos seguidos</b><br>
+     Ainda dentro do aceitável, mas sem folga. Um quarto ciclo seguido coloca este grupo na mesma situação crítica — planeje a alternativa antes de fechar o receituário da próxima safra.</div>`).join("");
+  const past=rs.filter(([,x])=>x.nivel==="passado");
+  if(past.length)msg+=`<div class="past-box"><b>Sequências já interrompidas</b><br>
+     ${past.map(([g,x])=>`${nome(g)} chegou a ${x.max} ciclos seguidos e saiu do programa`).join("; ")}. Mantido no registro porque a pressão de seleção acumulada não desaparece — se voltar ao programa, volta partindo desse histórico.</div>`;
+  if(!msg)msg=`<div class="ok">Nenhum grupo HRAC repetido por três ciclos seguidos neste talhão. A rotação de mecanismos está sendo mantida.</div>`;
+  $("#moaMsg").innerHTML=msg;
+
+  const arr=[...ias.entries()].sort((a,b)=>b[1]-a[1]);
+  $("#ias").innerHTML=arr.length?`<table><thead><tr><th>Ingrediente ativo</th><th>Vezes aplicado</th><th>Ciclos</th></tr></thead><tbody>`
+    +arr.map(([ia,n])=>{
+      const anos=cs.filter(c=>c.ops.some(o=>o.prods.some(p=>p.ia===ia))).map(c=>c.tag);
+      return `<tr><td>${esc(ia)}</td><td class="mono">${n}</td><td class="mono" style="font-size:11.5px;color:var(--tinta2)">${anos.join(" · ")}</td></tr>`;
+    }).join("")+`</tbody></table>`
+    :`<p style="color:var(--tinta3);font-size:13px;margin:0">Nenhum herbicida registrado.</p>`;
+}
+
+/* ===================== render e eventos ===================== */
+function render(){
+  selKey=null;drawPerfil();drawFluxo();drawConsulta();
+  $("#detail").innerHTML='<p class="empty">Clique em um marcador para ver produtos, doses, alvos e resultado da aplicação.</p>';
+}
+function marcarEscala(){$$("#escala .chip").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.w===MW))}
+
+function boot(){
+  $("#fz").innerHTML=`<option>${P.nome} — ${P.mun}</option>`;
+  $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}">${t.nome} · ${t.ha} ha</option>`).join("");
+  $("#mstart").innerHTML=[3,4,5,6,0].map(m=>`<option value="${m}"${m===START?" selected":""}>${cap(MESL[m])}</option>`).join("");
+  $("#tl").onchange=e=>{cur=+e.target.value;fillCiclos();render()};
+  $("#mstart").onchange=e=>{START=+e.target.value;fillCiclos();render()};
+  marcarEscala();fillCiclos();render();
+}
+
+$$(".tab").forEach(b=>b.onclick=()=>{
+  $$(".tab").forEach(x=>x.setAttribute("aria-selected",x===b));
+  $$(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+b.dataset.p));
+});
+$("#sf").onchange=drawFluxo;
+
+/* escala do eixo e atalhos de rolagem */
+$$("#escala .chip").forEach(c=>c.onclick=()=>{
+  const sc=$("#pfScroll"),f=sc.scrollLeft/Math.max(1,sc.scrollWidth-sc.clientWidth);
+  MW=+c.dataset.w;drawPerfil();marcarEscala();
+  sc.scrollLeft=f*(sc.scrollWidth-sc.clientWidth);
+});
+$("#irpara").onclick=e=>{
+  const c=e.target.closest(".chip");if(!c)return;
+  const mb=MB(),k=mb.findIndex(x=>x.m===+c.dataset.m);
+  $("#pfScroll").scrollTo({left:k<0?0:mb[k].a/100*(MW*12),behavior:"smooth"});
+};
+
+/* arrastar com o mouse para percorrer o ciclo (no toque a rolagem nativa já resolve) */
+(()=>{
+  const sc=$("#pfScroll");let d=null;
+  sc.addEventListener("pointerdown",e=>{
+    if(e.pointerType!=="mouse"||e.button!==0)return;
+    if(sc.scrollWidth<=sc.clientWidth)return;
+    d={x:e.clientX,sl:sc.scrollLeft,moveu:false};
+  });
+  window.addEventListener("pointermove",e=>{
+    if(!d)return;
+    const dx=e.clientX-d.x;
+    if(!d.moveu&&Math.abs(dx)<4)return;
+    d.moveu=true;sc.classList.add("panning");
+    sc.scrollLeft=d.sl-dx;e.preventDefault();
+  },{passive:false});
+  window.addEventListener("pointerup",()=>{
+    if(d&&d.moveu)setTimeout(()=>sc.classList.remove("panning"),0);  /* engole o clique do arraste */
+    else sc.classList.remove("panning");
+    d=null;
+  });
+})();
+
+/* favicon reaproveitando a logo embutida */
+(()=>{const u=getComputedStyle(document.documentElement).getPropertyValue("--logo").trim().slice(4,-1).replace(/^["']|["']$/g,"");
+ const l=document.createElement("link");l.rel="icon";l.href=u;document.head.appendChild(l);})();
+
+/* portão */
+function entrar(){
+  const v=$("#code").value.trim().toUpperCase();
+  if(v==="SRQ-2201"||v==="DEMO"){$("#gate").remove();$("#app").hidden=false;boot()}
+  else $("#gerr").textContent="Código não encontrado. Confira com seu consultor.";
+}
+$("#enter").onclick=entrar;
+$("#code").onkeydown=e=>{if(e.key==="Enter")entrar()};
+
+/* modais */
+$("#openAdd").onclick=()=>{$("#mAdd").hidden=false;$("#a-data").focus()};
+$("#openJson").onclick=()=>{$("#jsonBox").value=JSON.stringify(T(),null,1);$("#mJson").hidden=false};
+$$("[data-close]").forEach(b=>b.onclick=()=>{$("#"+b.dataset.close).hidden=true});
+$$(".mask").forEach(m=>m.onclick=e=>{if(e.target===m)m.hidden=true});
+document.onkeydown=e=>{if(e.key==="Escape")$$(".mask").forEach(m=>m.hidden=true)};
+
+$("#saveAdd").onclick=()=>{
+  const data=$("#a-data").value;
+  if(!data){$("#aerr").textContent="Informe a data do manejo.";return}
+  const prods=$("#a-prod").value.split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const p=l.split("|").map(x=>x.trim());
+    return {nome:p[0]||"—",ia:p[1]||"—",dose:p[2]||"—",hrac:p[3]||""};
+  });
+  T().ops.push({data,tipo:$("#a-tipo").value,
+    alvos:$("#a-alvo").value.split(",").map(x=>x.trim()).filter(Boolean),
+    prods,efic:+$("#a-efic").value||0,obs:$("#a-obs").value.trim()});
+  $("#aerr").textContent="";$("#mAdd").hidden=true;
+  ["a-alvo","a-prod","a-efic","a-obs"].forEach(id=>$("#"+id).value="");
+  fillCiclos();render();
+  $("#sf").value=tagCiclo(anoCiclo(data));drawFluxo();
+};
+
+$("#copyJson").onclick=()=>{const b=$("#jsonBox");b.select();
+  navigator.clipboard?.writeText(b.value).catch(()=>{});$("#jerr").textContent="Copiado."};
+$("#loadJson").onclick=()=>{
+  try{const d=JSON.parse($("#jsonBox").value);
+    if(!Array.isArray(d.ops)||!Array.isArray(d.uso))throw 0;
+    d.pressao=d.pressao||{};
+    P.talhoes[cur]=d;$("#jerr").textContent="";$("#mJson").hidden=true;
+    $("#tl").options[cur].textContent=(d.nome||"Talhão")+" · "+(d.ha||"?")+" ha";
+    fillCiclos();render();
+  }catch(e){$("#jerr").textContent="JSON inválido — precisa conter as listas ops e uso."}
+};
+</script>
