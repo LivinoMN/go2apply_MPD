@@ -49,6 +49,10 @@ h3{font-size:16px;text-transform:uppercase;letter-spacing:.05em}
 .btn.ghost:hover{background:var(--branco);border-color:var(--verde);color:var(--verde-esc)}
 .btn.sm{padding:6px 11px;font-size:13px}
 .hint{font-size:12.5px;color:var(--tinta2);margin-top:14px}
+.linkish{display:block;width:100%;margin-top:10px;background:none;border:0;padding:4px;
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:12px;
+  font-weight:600;color:var(--verde-esc);text-decoration:underline;text-underline-offset:3px}
+.linkish:hover{color:var(--tinta)}
 .err{color:var(--alerta);font-size:12.5px;margin-top:10px;min-height:18px}
 
 /* ---------- cabeçalho ---------- */
@@ -235,6 +239,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
     </div>
     <div class="err" id="gerr"></div>
     <button class="btn" id="enter" style="width:100%">Entrar</button>
+    <button class="linkish" id="toggleNovo" hidden>Primeiro acesso — criar senha</button>
     <p class="hint">Protótipo de demonstração — use <span class="mono">SRQ-2201</span> ou <span class="mono">DEMO</span>. A autenticação de verdade fica no servidor, não aqui.</p>
   </div>
 </div>
@@ -357,14 +362,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
    demonstração, com os dados fictícios embutidos abaixo e sem gravar nada.
    Esta configuração não é segredo — quem protege os dados é firestore.rules.
    =================================================================== */
-const FIREBASE = {
-  apiKey: "AIzaSyB3xK...",
-  authDomain: "go2apply-mpd.firebaseapp.com",
-  projectId: "go2apply-mpd",
-  storageBucket: "go2apply-mpd.firebasestorage.app",
-  messagingSenderId: "482910573621",
-  appId: "1:482910573621:web:9f3c8a1b2d4e5f6a"
-};
+const FIREBASE = null;
 /* exemplo:
 const FIREBASE = {
   apiKey: "...", authDomain: "seu-projeto.firebaseapp.com",
@@ -558,9 +556,48 @@ const DB = {
       throw new Error(e.code==="auth/invalid-credential" || e.code==="auth/wrong-password"
         ? "E-mail ou senha incorretos." : "Não foi possível entrar: "+e.code);
     }
-    const perf = await F.getDoc(F.doc(db,"usuarios",cred.user.uid));
-    if(!perf.exists()) throw new Error("Usuário sem perfil cadastrado. Fale com a Equalizagro.");
-    this.usuario = {uid:cred.user.uid, ...perf.data()};
+    this.usuario = await this._perfil(cred.user);
+  },
+
+  /* primeiro acesso: a conta é criada pelo próprio convidado.
+     Sem convite prévio a conta nasce sem perfil e é descartada na hora. */
+  async criarConta(email, senha){
+    const {auth,A} = await this._sdk();
+    if((senha||"").length < 6) throw new Error("A senha precisa ter ao menos 6 caracteres.");
+    let cred;
+    try{
+      cred = await A.createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), senha);
+    }catch(e){
+      throw new Error(e.code==="auth/email-already-in-use"
+        ? "Já existe conta para este e-mail. Use Entrar, ou peça a redefinição de senha."
+        : e.code==="auth/invalid-email" ? "E-mail inválido." : "Não foi possível criar: "+e.code);
+    }
+    try{
+      this.usuario = await this._perfil(cred.user);
+    }catch(e){
+      await cred.user.delete().catch(()=>{});   /* não deixa conta órfã no projeto */
+      throw e;
+    }
+  },
+
+  /* devolve o perfil; se ainda não existir, cria a partir do convite.
+     A regra de segurança só aceita papel e clienteId iguais aos do convite,
+     então ninguém se promove a consultor por aqui. */
+  async _perfil(user){
+    const {db,F} = await this._sdk();
+    const ref = F.doc(db,"usuarios",user.uid);
+    const perf = await F.getDoc(ref);
+    if(perf.exists()) return {uid:user.uid, ...perf.data()};
+
+    const email = (user.email||"").toLowerCase();
+    const conv = await F.getDoc(F.doc(db,"convites",email));
+    if(!conv.exists())
+      throw new Error("Este e-mail não está autorizado. Fale com a Equalizagro.");
+
+    const c = conv.data();
+    const novo = {nome:c.nome||email, email, papel:c.papel, clienteId:c.clienteId??null};
+    await F.setDoc(ref, novo);
+    return {uid:user.uid, ...novo};
   },
 
   async sair(){
@@ -937,12 +974,22 @@ if(DB.modo==="firestore"){
   $("#code").type="email"; $("#code").placeholder="voce@fazenda.com.br";
   $("#code").classList.add("livre"); $("#code").autocomplete="username";
   $("#wrapPass").hidden=false;
+  $("#toggleNovo").hidden=false;
   $(".hint").innerHTML="Acesso concedido pela Equalizagro. Esqueceu a senha? Fale com seu consultor.";
 }
+let modoNovo=false;
+$("#toggleNovo").onclick=()=>{
+  modoNovo=!modoNovo;
+  $("#enter").textContent = modoNovo ? "Criar senha e entrar" : "Entrar";
+  $("#toggleNovo").textContent = modoNovo ? "Já tenho senha — entrar" : "Primeiro acesso — criar senha";
+  $("#pass").autocomplete = modoNovo ? "new-password" : "current-password";
+  $("#gerr").textContent="";
+};
 async function entrar(){
   const btn=$("#enter"); btn.disabled=true; $("#gerr").textContent="";
   try{
-    await DB.entrar($("#code").value, $("#pass").value);
+    if(modoNovo) await DB.criarConta($("#code").value, $("#pass").value);
+    else await DB.entrar($("#code").value, $("#pass").value);
     await DB.carregar();
     $("#gate").remove(); $("#app").hidden=false; boot();
   }catch(e){
