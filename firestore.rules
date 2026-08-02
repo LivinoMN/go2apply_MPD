@@ -124,7 +124,10 @@ service cloud.firestore {
           allow read:   if acessa(clienteId);
           allow create: if acessa(clienteId) && autoriaHonesta()
                         && request.resource.data.cultura in
-                           ['soja','trigo','aveia','milho','cobertura','pousio'];
+                           ['soja','trigo','aveia','milho','cobertura','pousio','outro']
+                        && (!('descricao' in request.resource.data)
+                            || (request.resource.data.descricao is string
+                                && request.resource.data.descricao.size() <= 40));
           allow update: if acessa(clienteId)
                         && request.resource.data.diff(resource.data).affectedKeys()
                              .hasOnly(['status','revisadoPor','revisadoEm']);
