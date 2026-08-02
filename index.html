@@ -594,6 +594,27 @@ const DB = {
     return this._fb;
   },
 
+  /* traduz os códigos do Firebase para algo acionável */
+  _erro(e){
+    const m={
+      "auth/configuration-not-found":
+        "Login por e-mail e senha não está ativado no Firebase. No console: Build → Authentication → Sign-in method → E-mail/senha → Ativar.",
+      "auth/unauthorized-domain":
+        "Este endereço não está autorizado. No console: Authentication → Settings → Domínios autorizados.",
+      "auth/invalid-credential":"E-mail ou senha incorretos.",
+      "auth/wrong-password":"E-mail ou senha incorretos.",
+      "auth/user-not-found":"Não existe conta para este e-mail. Use “Primeiro acesso — criar senha”.",
+      "auth/invalid-email":"E-mail inválido.",
+      "auth/email-already-in-use":"Já existe conta para este e-mail. Use Entrar, ou peça a redefinição de senha.",
+      "auth/weak-password":"A senha precisa ter ao menos 6 caracteres.",
+      "auth/too-many-requests":"Muitas tentativas seguidas. Aguarde alguns minutos.",
+      "auth/network-request-failed":"Sem conexão com o Firebase. Verifique a internet.",
+      "permission-denied":
+        "O Firestore recusou o acesso. Confira se as regras publicadas são as do firestore.rules."
+    };
+    return new Error(m[e.code] || ((e.message||"Falha inesperada")+" ("+(e.code||"sem código")+")"));
+  },
+
   /* ---- autenticação ---- */
   async entrar(id, senha){
     if(this.modo==="demo"){
@@ -606,10 +627,7 @@ const DB = {
     let cred;
     try{
       cred = await A.signInWithEmailAndPassword(auth, id.trim(), senha);
-    }catch(e){
-      throw new Error(e.code==="auth/invalid-credential" || e.code==="auth/wrong-password"
-        ? "E-mail ou senha incorretos." : "Não foi possível entrar: "+e.code);
-    }
+    }catch(e){ throw this._erro(e); }
     this.usuario = await this._perfil(cred.user);
   },
 
@@ -621,11 +639,7 @@ const DB = {
     let cred;
     try{
       cred = await A.createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), senha);
-    }catch(e){
-      throw new Error(e.code==="auth/email-already-in-use"
-        ? "Já existe conta para este e-mail. Use Entrar, ou peça a redefinição de senha."
-        : e.code==="auth/invalid-email" ? "E-mail inválido." : "Não foi possível criar: "+e.code);
-    }
+    }catch(e){ throw this._erro(e); }
     try{
       this.usuario = await this._perfil(cred.user);
     }catch(e){
