@@ -143,6 +143,19 @@ main{max-width:1240px;margin:0 auto;padding:26px 20px 90px}
   padding:5px 10px;border:1px solid var(--linha);background:var(--branco);border-radius:2px;color:var(--tinta2)}
 .chip:hover{border-color:var(--verde);color:var(--verde-esc)}
 .winlbl{font-family:var(--mono);font-size:12px;color:var(--tinta3);white-space:nowrap}
+.linha{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--linha2);font-size:13.5px}
+.linha:last-child{border-bottom:0}
+.linha .nm{flex:1;min-width:0}
+.linha .sub{color:var(--tinta3);font-size:12px}
+.linha .mini{background:none;border:1px solid var(--linha);border-radius:2px;padding:3px 8px;
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;font-size:11px;font-weight:600;color:var(--tinta2)}
+.linha .mini:hover{border-color:var(--verde);color:var(--verde-esc)}
+.linha.sel{background:#F3F6F1}
+.nada{color:var(--tinta3);font-size:13px;padding:6px 0}
+.vazio{background:var(--branco);border:1px dashed var(--linha);border-radius:3px;
+  padding:22px 24px;color:var(--tinta2);font-size:13.5px;line-height:1.7}
+.vazio b{display:block;font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;
+  font-size:15px;color:var(--tinta);margin-bottom:6px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font-size:12px;color:var(--tinta2)}
 .legend b{display:inline-flex;align-items:center;gap:6px;font-weight:400}
 .sw{width:12px;height:12px;border-radius:2px;display:inline-block}
@@ -261,6 +274,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
   <button class="tab" role="tab" aria-selected="true" data-p="perfil">Perfil histórico</button>
   <button class="tab" role="tab" aria-selected="false" data-p="fluxo">Fluxograma da safra</button>
   <button class="tab" role="tab" aria-selected="false" data-p="consulta">Base de consulta</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="cadastro" id="tabCad" hidden>Cadastro</button>
 </div></nav>
 
 <main>
@@ -279,6 +293,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
       <div class="selin"><label>Ir para</label><div class="chips" id="irpara"></div></div>
       <span class="winlbl" id="eixo"></span>
     </div>
+    <div id="semTalhao" class="vazio" hidden></div>
     <div class="profile"><div class="pf-scroll" id="pfScroll"><div class="pf-inner" id="pf"></div></div></div>
     <div class="legend" id="legend"></div>
     <div class="detail" id="detail"><p class="empty">Clique em um marcador para ver produtos, doses, alvos e resultado da aplicação.</p></div>
@@ -313,6 +328,54 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
       <div id="ias"></div>
     </div>
   </section>
+
+  <!-- CADASTRO -->
+  <section class="panel" id="p-cadastro">
+    <h1>Cadastro</h1>
+    <p class="lede">Propriedades, talhões e uso do solo. Só quem tem papel de consultor enxerga esta aba — o cliente registra manejo, mas não altera cadastro.</p>
+
+    <div class="block">
+      <h3 style="margin-bottom:12px">Propriedades</h3>
+      <div id="listaClientes"></div>
+      <div class="frow" style="margin-top:14px">
+        <div class="f"><label for="c-nome">Nome da propriedade</label><input id="c-nome" placeholder="Fazenda São Roque"></div>
+        <div class="f"><label for="c-mun">Município / UF</label><input id="c-mun" placeholder="Cruz Alta / RS"></div>
+        <div class="f full"><button class="btn sm" id="addCliente">Adicionar propriedade</button>
+          <span class="err" id="cerr" style="display:inline;margin-left:10px"></span></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3 style="margin-bottom:4px">Talhões</h3>
+      <p style="color:var(--tinta2);font-size:13px;margin:0 0 12px">Da propriedade selecionada no topo da página: <b id="cadCli">—</b></p>
+      <div id="listaTalhoes"></div>
+      <div class="frow" style="margin-top:14px">
+        <div class="f"><label for="t-nome">Nome do talhão</label><input id="t-nome" placeholder="T1 — Coxilha"></div>
+        <div class="f"><label for="t-ha">Área (ha)</label><input id="t-ha" type="number" step="0.1" placeholder="82"></div>
+        <div class="f full"><label for="t-solo">Solo</label><input id="t-solo" placeholder="Latossolo vermelho, argiloso"></div>
+        <div class="f full"><button class="btn sm" id="addTalhao">Adicionar talhão</button>
+          <span class="err" id="terr" style="display:inline;margin-left:10px"></span></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3 style="margin-bottom:4px">Uso do solo</h3>
+      <p style="color:var(--tinta2);font-size:13px;margin:0 0 12px">É o que colore as faixas do perfil histórico. Informe cada cultura com início e fim: <b id="cadTal">—</b></p>
+      <div id="listaUso"></div>
+      <div class="frow" style="margin-top:14px">
+        <div class="f"><label for="u-cult">Cultura</label><select id="u-cult">
+          <option value="soja">Soja</option><option value="trigo">Trigo</option>
+          <option value="aveia">Aveia preta</option><option value="milho">Milho</option>
+          <option value="cobertura">Cobertura consorciada</option><option value="pousio">Pousio</option>
+        </select></div>
+        <div class="f"><label for="u-ini">Início</label><input type="date" id="u-ini"></div>
+        <div class="f"><label for="u-fim">Fim</label><input type="date" id="u-fim"></div>
+        <div class="f full"><button class="btn sm" id="addUso">Adicionar período</button>
+          <span class="err" id="uerr" style="display:inline;margin-left:10px"></span></div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer>Protótipo de demonstração. Dados de exemplo, não constituem recomendação agronômica. Toda aplicação exige receituário emitido por profissional habilitado.</footer>
@@ -609,23 +672,46 @@ const DB = {
   async carregar(){
     if(this.modo==="demo"){
       Object.assign(P, JSON.parse(JSON.stringify(DEMO_EMBUTIDO)));
+      this.clientes=[{id:"demo",nome:P.nome,municipio:P.mun}];
+      this.clienteAtual="demo";
+      P.talhoes.forEach((t,i)=>{
+        t.id=t.id||"t"+i;
+        t.usoDocs=t.uso.map((u,k)=>({id:"u"+i+"_"+k,cultura:u[0],inicio:u[1],fim:u[2]}));
+      });
       return;
     }
     const {db,F} = await this._sdk(), u=this.usuario;
     const ids = u.papel==="consultor"
       ? (await F.getDocs(F.collection(db,"clientes"))).docs.map(d=>d.id)
       : [u.clienteId];
-    if(!ids.length) throw new Error("Nenhum cliente vinculado a este usuário.");
-
     this.clientes=[];
     for(const id of ids){
+      if(!id) continue;
       const c = await F.getDoc(F.doc(db,"clientes",id));
       if(c.exists()) this.clientes.push({id, ...c.data()});
+    }
+
+    if(!this.clientes.length){
+      /* consultor num banco ainda vazio entra assim mesmo e vê o que fazer */
+      if(u.papel==="consultor"){
+        this.clienteAtual=null; P.nome="Nenhum cliente cadastrado"; P.mun=""; P.talhoes=[];
+        return;
+      }
+      throw new Error("Seu convite não aponta para um cliente válido. Fale com a Equalizagro.");
     }
     await this.abrirCliente(this.clientes[0].id);
   },
 
   async abrirCliente(clienteId){
+    if(this.modo==="demo"){
+      this._bag = this._bag || {};
+      if(this.clienteAtual) this._bag[this.clienteAtual]=P.talhoes;
+      this.clienteAtual=clienteId;
+      P.talhoes = this._bag[clienteId] || (this._bag[clienteId]=[]);
+      const c=this.clientes.find(x=>x.id===clienteId);
+      P.nome=c.nome; P.mun=c.municipio||"";
+      return;
+    }
     const {db,F} = await this._sdk();
     const c = this.clientes.find(x=>x.id===clienteId);
     this.clienteAtual = clienteId;
@@ -642,11 +728,71 @@ const DB = {
       P.talhoes.push({
         id:d.id, ...d.data(),
         ops: mj.docs.map(x=>({id:x.id, ...x.data()})).filter(o=>o.status!=="cancelado"&&o.status!=="corrigido"),
+        usoDocs: us.docs.filter(x=>x.data().status!=="cancelado")
+                        .map(x=>({id:x.id, ...x.data()})),
         uso: us.docs.filter(x=>x.data().status!=="cancelado")
                    .map(x=>[x.data().cultura, x.data().inicio, x.data().fim]),
         pressao
       });
     }
+  },
+
+  /* ---- cadastro (só consultor; a regra de segurança confirma) ---- */
+  async criarCliente({nome,municipio}){
+    if(this.modo==="demo"){
+      const id="c"+Date.now(); this.clientes.push({id,nome,municipio}); return id;
+    }
+    const {db,F}=await this._sdk();
+    const r=await F.addDoc(F.collection(db,"clientes"),
+      {nome, municipio, criadoEm:F.serverTimestamp()});
+    this.clientes.push({id:r.id,nome,municipio});
+    return r.id;
+  },
+
+  async salvarCliente(id,{nome,municipio}){
+    const c=this.clientes.find(x=>x.id===id); Object.assign(c,{nome,municipio});
+    if(this.modo==="demo") return;
+    const {db,F}=await this._sdk();
+    await F.updateDoc(F.doc(db,"clientes",id),{nome,municipio});
+  },
+
+  async criarTalhao({nome,ha,solo}){
+    const t={nome,ha:+ha||0,solo:solo||"",ops:[],uso:[],usoDocs:[],pressao:{}};
+    if(this.modo==="demo"){ t.id="t"+Date.now(); P.talhoes.push(t); return; }
+    if(!this.clienteAtual) throw new Error("Selecione ou crie uma propriedade antes.");
+    const {db,F}=await this._sdk();
+    const r=await F.addDoc(F.collection(db,"clientes",this.clienteAtual,"talhoes"),
+      {nome:t.nome, ha:t.ha, solo:t.solo, criadoPor:this.usuario.uid, criadoEm:F.serverTimestamp()});
+    t.id=r.id; P.talhoes.push(t);
+  },
+
+  async salvarTalhao(id,{nome,ha,solo}){
+    const t=P.talhoes.find(x=>x.id===id); Object.assign(t,{nome,ha:+ha||0,solo});
+    if(this.modo==="demo") return;
+    const {db,F}=await this._sdk();
+    await F.updateDoc(F.doc(db,"clientes",this.clienteAtual,"talhoes",id),{nome:t.nome,ha:t.ha,solo:t.solo});
+  },
+
+  async criarUso(talhaoId,{cultura,inicio,fim}){
+    const t=P.talhoes.find(x=>x.id===talhaoId);
+    if(this.modo==="demo"){
+      t.usoDocs.push({id:"u"+Date.now(),cultura,inicio,fim}); sincUso(t); return;
+    }
+    const {db,F}=await this._sdk();
+    const r=await F.addDoc(F.collection(db,"clientes",this.clienteAtual,"talhoes",talhaoId,"uso"),
+      {cultura, inicio, fim, status:"ativo",
+       criadoPor:this.usuario.uid, criadoEm:F.serverTimestamp()});
+    t.usoDocs.push({id:r.id,cultura,inicio,fim}); sincUso(t);
+  },
+
+  /* não apaga: marca como cancelado, conforme a regra */
+  async removerUso(talhaoId,usoId){
+    const t=P.talhoes.find(x=>x.id===talhaoId);
+    t.usoDocs=t.usoDocs.filter(u=>u.id!==usoId); sincUso(t);
+    if(this.modo==="demo") return;
+    const {db,F}=await this._sdk();
+    await F.updateDoc(F.doc(db,"clientes",this.clienteAtual,"talhoes",talhaoId,"uso",usoId),
+      {status:"cancelado", revisadoPor:this.usuario.uid, revisadoEm:F.serverTimestamp()});
   },
 
   /* ---- escrita: append-only ---- */
@@ -660,6 +806,11 @@ const DB = {
     T().ops.push({id:novo.id, ...doc, criadoEm:new Date().toISOString()});
   }
 };
+
+function sincUso(t){
+  t.usoDocs.sort((a,b)=>a.inicio<b.inicio?-1:1);
+  t.uso=t.usoDocs.map(u=>[u.cultura,u.inicio,u.fim]);
+}
 
 /* ===================== estado ===================== */
 let cur=0, selKey=null, MW=110, START=3;   /* MW = largura do mês em px, START = 0 jan … 3 abr */
@@ -725,7 +876,8 @@ function clsGrupo(risco,g){const x=risco[g];return x?" "+NIVEL[x.nivel]:""}
 
 /* ===================== perfil histórico ===================== */
 function drawPerfil(){
-  const t=T(),cs=ciclos(t),risco=analiseMoa(cs),mb=MB(),total=MW*12;
+  const t=T(); if(!t) return;
+  const cs=ciclos(t),risco=analiseMoa(cs),mb=MB(),total=MW*12;
   const ruler=`<div class="ruler">`+mb.map(m=>
     `<b style="left:${m.a}%;width:${m.b-m.a}%">${MW<70?m.n[0]:m.n}</b>`).join("")+`</div>`;
   const grid=mb.map(m=>`<i style="left:${m.a}%"></i>`).join("");
@@ -801,12 +953,14 @@ function showDetail(tag,i){
 
 /* ===================== fluxograma ===================== */
 function fillCiclos(){
+  if(!T()){$("#sf").innerHTML="";return}
   const cs=ciclos(T());
   $("#sf").innerHTML=[...cs].reverse().map(c=>`<option value="${c.tag}">${c.tag}</option>`).join("");
   if(cs.length)$("#sf").value=cs[cs.length-1].tag;
 }
 function drawFluxo(){
-  const t=T(),cs=ciclos(t);
+  const t=T(); if(!t) return;
+  const cs=ciclos(t);
   const c=cs.find(x=>x.tag===$("#sf").value)||cs[cs.length-1];
   if(!c){$("#flow").innerHTML="";return}
   const risco=analiseMoa(cs),evs=[];
@@ -841,7 +995,8 @@ function drawFluxo(){
 
 /* ===================== base de consulta ===================== */
 function drawConsulta(){
-  const t=T(),cs=ciclos(t),risco=analiseMoa(cs),nS=cs.length||1;
+  const t=T(); if(!t) return;
+  const cs=ciclos(t),risco=analiseMoa(cs),nS=cs.length||1;
   let apl=0,ias=new Map(),grps=new Set(),comRes=0;
   cs.forEach(c=>c.ops.forEach(o=>{
     if(o.prods.length)apl++;
@@ -902,27 +1057,150 @@ function drawConsulta(){
 
 /* ===================== render e eventos ===================== */
 function render(){
-  selKey=null;drawPerfil();drawFluxo();drawConsulta();
+  selKey=null;
+  const vazio=!P.talhoes.length;
+  $("#semTalhao").hidden=!vazio;
+  if(vazio) $("#semTalhao").innerHTML = (DB.modo==="firestore" && !DB.clienteAtual)
+    ? `<b>Nenhum cliente cadastrado ainda.</b>
+       Crie o primeiro documento na coleção <span class="mono">clientes</span> do console do Firebase,
+       com os campos <span class="mono">nome</span> e <span class="mono">municipio</span>. Depois,
+       dentro dele, a subcoleção <span class="mono">talhoes</span>.
+       <br><br><button class="btn sm" onclick="irCadastro()">Ir para o cadastro</button>`
+    : `<b>Nenhum talhão cadastrado ainda.</b>
+       Crie o primeiro em <span class="mono">clientes/${DB.clienteAtual||"{id}"}/talhoes</span>,
+       com os campos <span class="mono">nome</span>, <span class="mono">ha</span> e
+       <span class="mono">solo</span>. Assim que existir, ele aparece aqui.
+       <br><br><button class="btn sm" onclick="irCadastro()">Ir para o cadastro</button>`;
+  ["#p-perfil .tlbar","#p-perfil .profile","#p-perfil .legend","#detail"]
+    .forEach(sel=>{const el=$(sel); if(el) el.hidden=vazio});
+  if(vazio){$("#flow").innerHTML="";$("#cards").innerHTML="";
+    ["#press","#moa","#moaMsg","#ias"].forEach(x=>$(x).innerHTML="");return}
+  drawPerfil();drawFluxo();drawConsulta();
   $("#detail").innerHTML='<p class="empty">Clique em um marcador para ver produtos, doses, alvos e resultado da aplicação.</p>';
 }
 function marcarEscala(){$$("#escala .chip").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.w===MW))}
 
-function boot(){
-  if(DB.modo==="firestore" && DB.clientes && DB.clientes.length>1){
-    $("#fz").innerHTML=DB.clientes.map(c=>
-      `<option value="${c.id}"${c.id===DB.clienteAtual?" selected":""}>${c.nome} — ${c.municipio||""}</option>`).join("");
-    $("#fz").onchange=async e=>{
-      await DB.abrirCliente(e.target.value);
-      cur=0; $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}">${t.nome} · ${t.ha} ha</option>`).join("");
-      fillCiclos(); render();
-    };
-  } else $("#fz").innerHTML=`<option>${P.nome} — ${P.mun}</option>`;
-  $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}">${t.nome} · ${t.ha} ha</option>`).join("");
-  $("#mstart").innerHTML=[3,4,5,6,0].map(m=>`<option value="${m}"${m===START?" selected":""}>${cap(MESL[m])}</option>`).join("");
-  $("#tl").onchange=e=>{cur=+e.target.value;fillCiclos();render()};
-  $("#mstart").onchange=e=>{START=+e.target.value;fillCiclos();render()};
-  marcarEscala();fillCiclos();render();
+function seletores(){
+  const cs=DB.clientes||[];
+  if(cs.length){
+    $("#fz").innerHTML=cs.map(c=>
+      `<option value="${c.id}"${c.id===DB.clienteAtual?" selected":""}>${esc(c.nome)}${c.municipio?" — "+esc(c.municipio):""}</option>`).join("");
+    $("#fz").disabled=cs.length<2;
+  } else { $("#fz").innerHTML=`<option>${esc(P.nome)}</option>`; $("#fz").disabled=true; }
+  $("#tl").innerHTML=P.talhoes.map((t,i)=>`<option value="${i}"${i===cur?" selected":""}>${esc(t.nome)} · ${t.ha} ha</option>`).join("")
+    || `<option>— nenhum talhão —</option>`;
 }
+
+function boot(){
+  $("#tabCad").hidden = DB.usuario?.papel !== "consultor";
+  seletores();
+  $("#fz").onchange=async e=>{
+    try{ await DB.abrirCliente(e.target.value); }catch(err){ alert(err.message); return; }
+    cur=0; seletores(); fillCiclos(); render(); cadastro();
+  };
+  $("#mstart").innerHTML=[3,4,5,6,0].map(m=>`<option value="${m}"${m===START?" selected":""}>${cap(MESL[m])}</option>`).join("");
+  $("#tl").onchange=e=>{cur=+e.target.value;fillCiclos();render();cadastro()};
+  $("#mstart").onchange=e=>{START=+e.target.value;fillCiclos();render()};
+  marcarEscala();fillCiclos();render();cadastro();
+}
+
+function irCadastro(){ $('[data-p="cadastro"]').click(); }
+window.irCadastro=irCadastro;
+
+/* ===================== aba cadastro ===================== */
+function cadastro(){
+  if($("#tabCad").hidden) return;
+  const cs=DB.clientes||[];
+  $("#listaClientes").innerHTML = cs.length ? cs.map(c=>
+    `<div class="linha${c.id===DB.clienteAtual?" sel":""}">
+       <div class="nm"><b>${esc(c.nome)}</b><div class="sub">${esc(c.municipio||"—")}</div></div>
+       ${c.id===DB.clienteAtual?"":`<button class="mini" data-abrir="${c.id}">Abrir</button>`}
+       <button class="mini" data-edc="${c.id}">Editar</button>
+     </div>`).join("") : `<div class="nada">Nenhuma propriedade cadastrada.</div>`;
+
+  const cAtual=cs.find(c=>c.id===DB.clienteAtual);
+  $("#cadCli").textContent=cAtual?cAtual.nome:"nenhuma selecionada";
+
+  $("#listaTalhoes").innerHTML = P.talhoes.length ? P.talhoes.map(t=>
+    `<div class="linha">
+       <div class="nm"><b>${esc(t.nome)}</b><div class="sub">${t.ha} ha · ${esc(t.solo||"solo não informado")} · ${t.ops.length} manejos</div></div>
+       <button class="mini" data-edt="${t.id}">Editar</button>
+     </div>`).join("") : `<div class="nada">Nenhum talhão nesta propriedade.</div>`;
+
+  const t=T();
+  $("#cadTal").textContent = t? t.nome : "nenhum talhão selecionado";
+  $("#listaUso").innerHTML = !t ? `<div class="nada">Selecione um talhão no topo da página.</div>`
+    : (t.usoDocs||[]).length ? (t.usoDocs).map(u=>
+    `<div class="linha">
+       <div class="nm"><b>${CULT[u.cultura]?CULT[u.cultura].n:u.cultura}</b>
+         <div class="sub mono">${fmt(u.inicio)} → ${fmt(u.fim)}</div></div>
+       <button class="mini" data-rmu="${u.id}">Remover</button>
+     </div>`).join("") : `<div class="nada">Nenhum período informado — as faixas do perfil ficam vazias.</div>`;
+}
+
+async function comBotao(btn, fn, alvoErro){
+  btn.disabled=true; $(alvoErro).textContent="";
+  try{ await fn(); }
+  catch(e){ $(alvoErro).textContent = e.message || String(e); }
+  finally{ btn.disabled=false; }
+}
+
+$("#addCliente").onclick=e=>comBotao(e.target, async()=>{
+  const nome=$("#c-nome").value.trim();
+  if(!nome) throw new Error("Informe o nome da propriedade.");
+  const id=await DB.criarCliente({nome, municipio:$("#c-mun").value.trim()});
+  $("#c-nome").value=$("#c-mun").value="";
+  if(!DB.clienteAtual) await DB.abrirCliente(id);
+  seletores(); cadastro(); fillCiclos(); render();
+}, "#cerr");
+
+$("#addTalhao").onclick=e=>comBotao(e.target, async()=>{
+  const nome=$("#t-nome").value.trim();
+  if(!nome) throw new Error("Informe o nome do talhão.");
+  if(!$("#t-ha").value) throw new Error("Informe a área em hectares.");
+  await DB.criarTalhao({nome, ha:$("#t-ha").value, solo:$("#t-solo").value.trim()});
+  $("#t-nome").value=$("#t-ha").value=$("#t-solo").value="";
+  cur=P.talhoes.length-1; seletores(); fillCiclos(); render(); cadastro();
+}, "#terr");
+
+$("#addUso").onclick=e=>comBotao(e.target, async()=>{
+  const t=T(); if(!t) throw new Error("Selecione um talhão primeiro.");
+  const i=$("#u-ini").value, f=$("#u-fim").value;
+  if(!i||!f) throw new Error("Informe início e fim.");
+  if(f<i) throw new Error("O fim não pode ser anterior ao início.");
+  await DB.criarUso(t.id,{cultura:$("#u-cult").value, inicio:i, fim:f});
+  $("#u-ini").value=$("#u-fim").value="";
+  fillCiclos(); render(); cadastro();
+}, "#uerr");
+
+$("#p-cadastro").onclick=async e=>{
+  const b=e.target.closest("button[data-abrir],button[data-edc],button[data-edt],button[data-rmu]");
+  if(!b) return;
+  const d=b.dataset;
+  try{
+    if(d.abrir){ await DB.abrirCliente(d.abrir); cur=0; seletores(); fillCiclos(); render(); cadastro(); }
+    if(d.edc){
+      const c=DB.clientes.find(x=>x.id===d.edc);
+      const nome=prompt("Nome da propriedade:",c.nome); if(nome===null) return;
+      const mun=prompt("Município / UF:",c.municipio||""); if(mun===null) return;
+      await DB.salvarCliente(d.edc,{nome:nome.trim(),municipio:mun.trim()});
+      seletores(); cadastro();
+    }
+    if(d.edt){
+      const t=P.talhoes.find(x=>x.id===d.edt);
+      const nome=prompt("Nome do talhão:",t.nome); if(nome===null) return;
+      const ha=prompt("Área em hectares:",t.ha); if(ha===null) return;
+      const solo=prompt("Solo:",t.solo||""); if(solo===null) return;
+      await DB.salvarTalhao(d.edt,{nome:nome.trim(),ha,solo:solo.trim()});
+      seletores(); render(); cadastro();
+    }
+    if(d.rmu){
+      if(!confirm("Remover este período de uso do solo?")) return;
+      await DB.removerUso(T().id, d.rmu);
+      fillCiclos(); render(); cadastro();
+    }
+  }catch(err){ alert(err.message||err); }
+};
 
 $$(".tab").forEach(b=>b.onclick=()=>{
   $$(".tab").forEach(x=>x.setAttribute("aria-selected",x===b));
@@ -991,9 +1269,14 @@ async function entrar(){
     if(modoNovo) await DB.criarConta($("#code").value, $("#pass").value);
     else await DB.entrar($("#code").value, $("#pass").value);
     await DB.carregar();
-    $("#gate").remove(); $("#app").hidden=false; boot();
+    $("#app").hidden=false;
+    boot();
+    $("#gate").remove();
   }catch(e){
-    $("#gerr").textContent=e.message||"Não foi possível entrar.";
+    $("#app").hidden=true;
+    const err=$("#gerr");
+    if(err) err.textContent=e.message||"Não foi possível entrar.";
+    else alert(e.message||"Não foi possível carregar os dados.");
     btn.disabled=false;
   }
 }
