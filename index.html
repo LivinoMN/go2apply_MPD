@@ -417,22 +417,13 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 40px;color:var(--tinta3);fo
   </div>
 </div></div>
 
+<script src="firebase-config.js"></script>
 <script>
-/* ===================================================================
-   CONFIGURAÇÃO DO FIREBASE
-   Cole aqui o objeto firebaseConfig do console (Configurações do projeto →
-   Seus apps → ícone </>). Enquanto ficar null, o app roda em modo de
-   demonstração, com os dados fictícios embutidos abaixo e sem gravar nada.
-   Esta configuração não é segredo — quem protege os dados é firestore.rules.
-   =================================================================== */
-const FIREBASE = null;
-/* exemplo:
-const FIREBASE = {
-  apiKey: "...", authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto", storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "...", appId: "..."
-};
-*/
+/* A configuração do Firebase mora em firebase-config.js, ao lado deste
+   arquivo — é lá que você edita, e não aqui. Sem ela, ou com a apiKey
+   ainda por preencher, o app roda em modo de demonstração. */
+const CFG = (typeof window!=="undefined" && window.FIREBASE_CONFIG) || null;
+const FIREBASE = (CFG && CFG.apiKey && CFG.apiKey !== "COLE-AQUI" && CFG.projectId) ? CFG : null;
 
 /* ===================== dados de exemplo ===================== */
 const MES = ["Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar"];

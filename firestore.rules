@@ -1,0 +1,152 @@
+rules_version = '2';
+
+// go2apply MPD — regras de acesso ao Firestore
+//
+// Princípios:
+//   1. Ninguém apaga histórico. `allow delete` é `false` em toda parte, para
+//      todo mundo, inclusive consultor. Correção cria registro novo.
+//   2. Manejo gravado é imutável. A única alteração permitida é marcar o
+//      status como corrigido ou cancelado — o conteúdo agronômico não muda.
+//   3. Cliente enxerga apenas os próprios talhões. Consultor enxerga todos.
+//   4. Quem escreveu fica registrado, e o campo não pode ser forjado:
+//      `criadoPor` tem de ser igual ao uid autenticado.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function perfil() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function consultor() {
+      return logado() && perfil().papel == 'consultor';
+    }
+
+    // consultor acessa qualquer cliente; cliente, apenas o seu
+    function acessa(clienteId) {
+      return logado() && (consultor() || perfil().clienteId == clienteId);
+    }
+
+    function convite() {
+      return get(/databases/$(database)/documents/convites/$(request.auth.token.email)).data;
+    }
+
+    function temConvite() {
+      return logado()
+          && exists(/databases/$(database)/documents/convites/$(request.auth.token.email));
+    }
+
+    // o autor declarado tem de ser quem está autenticado
+    function autoriaHonesta() {
+      return request.resource.data.criadoPor == request.auth.uid
+          && request.resource.data.criadoEm == request.time;
+    }
+
+    // ------------------------------------------------------------------
+    // convites/{email} — autorização prévia, criada pelo consultor.
+    // O id do documento é o e-mail em minúsculas. Campos: papel,
+    // clienteId, nome. É a única coisa que o consultor cadastra à mão.
+    // ------------------------------------------------------------------
+    match /convites/{email} {
+      // o convidado só enxerga o próprio convite
+      allow read:   if logado() && request.auth.token.email == email;
+      allow list:   if consultor();
+      allow create, update, delete: if consultor();
+    }
+
+    // ------------------------------------------------------------------
+    // usuarios/{uid} — papel e vínculo.
+    // O próprio usuário cria o seu no primeiro acesso, mas só consegue
+    // copiar papel e clienteId do convite. Depois de criado, é imutável:
+    // ninguém se promove a consultor nem troca de cliente.
+    // ------------------------------------------------------------------
+    match /usuarios/{uid} {
+      allow read:   if logado() && (request.auth.uid == uid || consultor());
+
+      allow create: if logado()
+                    && request.auth.uid == uid
+                    && temConvite()
+                    && request.resource.data.email == request.auth.token.email
+                    && request.resource.data.papel == convite().papel
+                    && request.resource.data.clienteId == convite().clienteId
+                    && request.resource.data.papel in ['consultor','cliente'];
+
+      allow update, delete: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // clientes/{clienteId} — a propriedade / o produtor
+    // ------------------------------------------------------------------
+    match /clientes/{clienteId} {
+      allow read:   if acessa(clienteId);
+      allow create, update: if consultor();
+      allow delete: if false;
+
+      // ----------------------------------------------------------------
+      // talhoes/{talhaoId} — cadastro. Só o consultor cria e edita.
+      // ----------------------------------------------------------------
+      match /talhoes/{talhaoId} {
+        allow read:   if acessa(clienteId);
+        allow create, update: if consultor();
+        allow delete: if false;
+
+        // --------------------------------------------------------------
+        // manejos/{manejoId} — o histórico. Append-only.
+        // Cliente e consultor registram; ninguém reescreve nem apaga.
+        // --------------------------------------------------------------
+        match /manejos/{manejoId} {
+          allow read: if acessa(clienteId);
+
+          allow create: if acessa(clienteId)
+                        && autoriaHonesta()
+                        && request.resource.data.status == 'ativo'
+                        && request.resource.data.data is string
+                        && request.resource.data.tipo in ['des','pre','pos','seq','mec','cul'];
+
+          // única mutação possível: aposentar o registro. O conteúdo fica.
+          allow update: if acessa(clienteId)
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['status','substituidoPor','revisadoPor','revisadoEm'])
+                        && request.resource.data.status in ['corrigido','cancelado']
+                        && request.resource.data.revisadoPor == request.auth.uid;
+
+          allow delete: if false;
+        }
+
+        // --------------------------------------------------------------
+        // uso/{usoId} — uso do solo (cultura, início, fim)
+        // --------------------------------------------------------------
+        match /uso/{usoId} {
+          allow read:   if acessa(clienteId);
+          allow create: if acessa(clienteId) && autoriaHonesta()
+                        && request.resource.data.cultura in
+                           ['soja','trigo','aveia','milho','cobertura','pousio'];
+          allow update: if acessa(clienteId)
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['status','revisadoPor','revisadoEm']);
+          allow delete: if false;
+        }
+
+        // --------------------------------------------------------------
+        // pressao/{ciclo} — observação de campo por ciclo. Mutável:
+        // é avaliação corrente, não registro de aplicação.
+        // --------------------------------------------------------------
+        match /pressao/{ciclo} {
+          allow read: if acessa(clienteId);
+          allow create, update: if acessa(clienteId)
+                        && request.resource.data.atualizadoPor == request.auth.uid;
+          allow delete: if false;
+        }
+      }
+    }
+
+    // nada fora do que está declarado acima
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
